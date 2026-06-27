@@ -1,0 +1,23 @@
+# robots.txt for The Dot Com Experience
+# Deploy this at the ROOT of the live website (https://<domain>/robots.txt) in Phase 3.
+# Policy: welcome all crawlers, including AI systems, so the movement is discoverable.
+
+User-agent: *
+Allow: /
+
+# AI / LLM crawlers explicitly welcomed (discoverability is a goal, not a risk, pre-launch).
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Point crawlers to the sitemap and the AI manifest (update domain on deploy).
+Sitemap: https://REPLACE-WITH-DOMAIN/sitemap.xml
+# See also: /llms.txt

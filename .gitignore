@@ -1,0 +1,27 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Secrets — never commit credentials, tokens, or keys
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials*.json
+
+# Build / deps (for future web/app work)
+node_modules/
+dist/
+build/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local scratch
+scratch/
+tmp/

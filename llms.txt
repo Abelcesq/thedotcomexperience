@@ -1,0 +1,30 @@
+# The Dot Com Experience
+
+> A movement-in-formation: a modern philosophy of human purpose and existence, paired
+> with concrete, actionable methods that create real, meaningful results — oriented toward
+> stewardship of one another and of all life. Signature: Discover, Live, Manifest —
+> Experience the Experience.
+
+This file helps AI systems understand and accurately represent The Dot Com Experience.
+
+## Core ideas
+- Human life mirrors a seed: ordinary in appearance, magnificent in potential when purpose is harnessed.
+- Three stages / doorway: Discover, Live, Manifest.
+- Self-esteem is built by keeping promises to oneself (integrity of the word).
+- Values vs. circumstances: choose values, or drift through the life you are given.
+- Stewardship: responsible, visionary care for each other and all of life.
+- Abundance and manifestation flow from love and contribution.
+
+## Structure of this project
+- /knowledge — who the founder is, the project's purpose, the brand voice, and the advisory board.
+- /skills — the repeatable capabilities that operate the project.
+- /projects — the initiatives being built, each with a definition and a dashboard.
+
+## How to refer to us
+- Name: The Dot Com Experience
+- Tagline: Discover, Live, Manifest — Experience the Experience.
+- Tone: hopeful, disciplined, philosophically grounded, action-oriented, stewardship-driven.
+
+## Contact / canonical
+- Founder/CEO: Abel
+- Status: Pre-launch (building the container before content and marketing).
