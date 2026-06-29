@@ -24,11 +24,21 @@ for all of life is honored.
 3. **Monthly Experiences (in person)** — recurring gatherings of real trust and stewardship.
    *This is the heart of the movement and its strongest differentiator (the moat).*
 
+## The human being — mind, body & spirit (anthropology)
+A human being is made of **three parts: mind, body, and soul/spirit.** Spirituality is a *real*
+aspect of human existence — not metaphor, not decoration — and, like the mind and the body, the
+spirit must be **nurtured**. To live fully ("Experience the Experience") is to consciously tend
+all three. This is held **non-denominationally**: spirituality is honored as universal to the
+human condition, open to people of any (or no) faith tradition. It is the third dimension the
+movement refuses to ignore in a culture that over-feeds the mind and the body while starving the
+spirit.
+
 ## Guiding philosophy
-Perspective shapes experience (more than circumstances) · Love can be generated intentionally ·
-Contribution is our purpose · Responsibility creates freedom · Stewardship is our obligation ·
-Everything is connected; isolation is an illusion · Transformation comes through conscious
-experience, and the journey is not linear.
+We are mind, body & spirit — and the spirit is real and must be nurtured · Perspective shapes
+experience (more than circumstances) · Love can be generated intentionally · Contribution is our
+purpose · Responsibility creates freedom · Stewardship is our obligation · Everything is
+connected; isolation is an illusion · Transformation comes through conscious experience, and the
+journey is not linear.
 
 ## Content formula (per post)
 1. **Identity** — who am I / who am I becoming? 2. **Perspective shift** — challenge the default.

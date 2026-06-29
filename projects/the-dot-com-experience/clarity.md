@@ -77,20 +77,28 @@ or you build a beautiful store with no one walking in.
 - **Discoverability:** AI-readable assets (✅ `llms.txt`, `web/`).
 - **Still needed (decisions + budget):** see `roadmap.md` Phases 3–5.
 
-## 7. Open questions only the CEO can answer  **[TODO: CEO]**
-1. **First audience:** Who is the *first* person this is for? (e.g., people at a life
-   crossroads? young men seeking discipline + meaning? faith-curious seekers? entrepreneurs?)
-   The whole strategy keys off this one answer.
-2. **Lead with what:** content/philosophy first, a program/course, or merchandise — and in
-   what order?
-3. **Definition of "win" for the next 12 months:** audience size? a finished framework? first
-   revenue? Pick one primary metric.
-4. **Time & money:** hours/week you can commit, and any budget for tools/hosting/contractors.
-5. **The name & "the Dot":** what does "Dot Com Experience" / "the Dot" mean to you precisely?
+## 6b. Decisions LOCKED by the CEO (2026-06-29)
+1. **First audience — RESOLVED.** **Driven builders/executors** who commit and act on passion
+   and drive — *and* who hold **spirituality as a real aspect of human existence that must be
+   nurtured** (mind · body · spirit). The board's refinement is folded in: aim at the driven
+   builder who senses that results without depth are hollow and wants ambition wedded to
+   meaning, stewardship, and a tended spirit. ("Drive with depth.")
+2. **Lead with — RESOLVED.** **Free content first** (give-give-give-ask), with a deliberate
+   value ladder designed in from day one (free framework → email capture → later paid tier).
+3. **Faith framing — RESOLVED.** **Faith-friendly:** rooted, values-forward, spirituality
+   honored as universal — explicitly **non-denominational**, never preachy. Spirituality is
+   named as real (the third part of the human being) without binding it to one tradition.
+4. **Anthropology adopted:** the human being = **mind, body, soul/spirit**; the spirit is real
+   and must be nurtured. Now a core philosophical pillar (see `foundation.md`).
+
+## 7. Open questions still only the CEO can answer  **[TODO: CEO]**
+1. **Definition of "win" for the next 12 months:** audience size? a finished framework? first
+   event? Pick one primary metric.
+2. **The funnel bridge:** the one clear path from an IG/X post → Skool → an eventual event.
+3. **Time & money:** hours/week you can commit, and any budget for tools/hosting/contractors.
+4. **The name & "the Dot":** what does "Dot Com Experience" / "the Dot" mean to you precisely?
    It shapes the brand and the IP.
-6. **Faith framing:** the board includes Jesus/Proverbs as guardrails — should the *public*
-   movement be explicitly faith-based, faith-friendly, or universal/secular? This is a
-   positioning fork with big downstream consequences.
+5. **First event:** city, size, format, and the concrete "experience of trust and stewardship."
 
 > Until these are answered, Claude will proceed on the defensible defaults stated in §5 and
 > flag every place an answer would change the plan.
