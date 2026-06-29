@@ -32,37 +32,78 @@ app.use((req, res, next) => {
 });
 
 // --- Email capture -------------------------------------------------------
-// Durable + owned: set the SUBSCRIBE_WEBHOOK config var to an endpoint that stores
-// the email (Formspree, a Google Apps Script URL, a Zapier/Make webhook, Mailchimp,
-// etc.). Without it, the email is still validated and logged (visible in `heroku logs`)
-// and appended to a local CSV — but note Heroku's filesystem is EPHEMERAL, so the CSV
-// is lost on restart/redeploy. Set SUBSCRIBE_WEBHOOK for real, durable capture.
+// Signups POST here. We send each email to your owned list. Two ways to wire it,
+// set via Heroku config vars (use either / both):
+//
+//   1) FLODESK (recommended) — set FLODESK_API_KEY (and optionally FLODESK_SEGMENT_ID).
+//      The email is upserted into your Flodesk audience (and added to the segment),
+//      ready for campaigns. Get the key in Flodesk → Account → Integrations/API.
+//
+//   2) SUBSCRIBE_WEBHOOK — a generic endpoint (Zapier/Make/Formspree/Apps Script).
+//      We POST { email, source } as JSON to it.
+//
+// Heroku's filesystem is EPHEMERAL, so the local CSV below is only a transient
+// fallback for logs/debugging — your real, durable list lives in Flodesk.
 const SUBSCRIBE_FILE = process.env.SUBSCRIBE_FILE || path.join(os.tmpdir(), 'subscribers.csv');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Push a subscriber into Flodesk via its API. Best-effort; logs the outcome.
+async function addToFlodesk(email) {
+  const key = process.env.FLODESK_API_KEY;
+  if (!key) return;
+  // Flodesk uses HTTP Basic auth with the API key as the username.
+  const auth = 'Basic ' + Buffer.from(key + ':').toString('base64');
+  const headers = { Authorization: auth, 'Content-Type': 'application/json' };
+  try {
+    // Upsert the subscriber (creates or updates by email).
+    const r = await fetch('https://api.flodesk.com/v1/subscribers', {
+      method: 'POST', headers, body: JSON.stringify({ email }),
+    });
+    if (!r.ok) { console.error('[flodesk] subscriber upsert returned', r.status); return; }
+
+    // Optionally add to a segment so campaigns can target this audience.
+    const seg = process.env.FLODESK_SEGMENT_ID;
+    if (seg) {
+      const r2 = await fetch(
+        'https://api.flodesk.com/v1/subscribers/' + encodeURIComponent(email) + '/segments',
+        { method: 'POST', headers, body: JSON.stringify({ segment_ids: [seg] }) }
+      );
+      if (!r2.ok) console.error('[flodesk] add-to-segment returned', r2.status);
+    }
+    console.log('[flodesk] added', email);
+  } catch (e) {
+    console.error('[flodesk] error:', e.message);
+  }
+}
+
+// POST to a generic webhook (Zapier/Make/Formspree/etc.). Best-effort.
+async function postWebhook(email) {
+  const hook = process.env.SUBSCRIBE_WEBHOOK;
+  if (!hook) return;
+  try {
+    const r = await fetch(hook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email, source: 'thedotx.com' }),
+    });
+    if (!r.ok) console.error('[subscribe] webhook returned', r.status);
+  } catch (e) {
+    console.error('[subscribe] webhook error:', e.message);
+  }
+}
 
 app.post('/api/subscribe', async (req, res) => {
   const email = ((req.body && req.body.email) || '').toString().trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return res.status(400).json({ ok: false, error: 'Please enter a valid email.' });
   }
-  const row = `${new Date().toISOString()},${email}\n`;
-  try { fs.appendFileSync(SUBSCRIBE_FILE, row); } catch (e) { /* best-effort */ }
+  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email}\n`); } catch (e) { /* best-effort */ }
   console.log('[subscribe]', email);
 
-  const hook = process.env.SUBSCRIBE_WEBHOOK;
-  if (hook) {
-    try {
-      const r = await fetch(hook, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ email, source: 'thedotx.com' }),
-      });
-      if (!r.ok) console.error('[subscribe] webhook returned', r.status);
-    } catch (e) {
-      console.error('[subscribe] webhook error:', e.message);
-      // Still acknowledge to the visitor; the email is in the logs/CSV.
-    }
-  }
+  // Fan out to whatever destinations are configured (both run if set).
+  await Promise.allSettled([addToFlodesk(email), postWebhook(email)]);
+
+  // Always acknowledge the visitor; the email is logged even if a provider hiccups.
   return res.json({ ok: true });
 });
 

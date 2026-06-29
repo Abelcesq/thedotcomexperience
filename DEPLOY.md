@@ -114,24 +114,33 @@ DNS can take 10–60 minutes (sometimes longer) to propagate. Then visit
 
 ---
 
-## E. Make email capture durable (important)
-The page has an email-capture form that POSTs to `/api/subscribe`. It works out of the box
-(emails are validated and logged — visible in `heroku logs --tail`), **but Heroku's disk is
-ephemeral**, so don't rely on the local CSV. To capture emails durably into something you own,
-set ONE config var to a webhook that stores them:
+## E. Wire email capture to your owned list (important)
+The page's email form POSTs to `/api/subscribe`. It works out of the box (emails are validated
+and logged in `heroku logs --tail`), **but Heroku's disk is ephemeral**, so the local CSV isn't
+a real list. Point it at an ESP you own. Two supported ways (set via **Settings → Config Vars**):
 
-- **Heroku → your app → Settings → Reveal Config Vars** → add
-  `SUBSCRIBE_WEBHOOK` = `<your endpoint URL>`
+### Option 1 — Flodesk (recommended)
+Flat pricing (unlimited subscribers), premium templates, built-in automations + Stripe checkout.
+1. Create a Flodesk account (flodesk.com — 30-day free trial, no card).
+2. In Flodesk, get your **API key**: Account → **Integrations / API** → copy the key.
+3. (Optional) Create a **Segment** (e.g. "Website Signups"). To find its ID, with your key run:
+   ```bash
+   curl -s https://api.flodesk.com/v1/segments -u "YOUR_API_KEY:"
+   ```
+   Copy the `id` of the segment you want.
+4. In Heroku → app → **Settings → Reveal Config Vars**, add:
+   - `FLODESK_API_KEY` = `<your key>`
+   - `FLODESK_SEGMENT_ID` = `<segment id>`  *(optional — omit to land everyone in the main audience)*
+5. The dyno restarts automatically. Submit a test email on the live site → it appears in Flodesk.
 
-Easy endpoints to use as the value (pick one, ~2 min):
-- **Formspree** (formspree.io) — create a form, use its `https://formspree.io/f/xxxx` URL.
-- **Google Sheet** — a Google Apps Script Web App URL that appends a row.
-- **Zapier / Make webhook** — catches the POST and pushes to Mailchimp/Sheets/etc.
-- **Mailchimp / ConvertKit / Beehiiv** — via their webhook or a Zap.
+The server upserts each email into your Flodesk audience (and the segment), ready for campaigns.
 
-The server POSTs `{ "email": "...", "source": "thedotx.com" }` to that URL. Once set, every
-signup lands in a list you control. (Until then, signups still succeed for the visitor and
-appear in the logs.)
+### Option 2 — Generic webhook (Zapier / Make / Formspree / Apps Script)
+Add `SUBSCRIBE_WEBHOOK` = `<endpoint URL>`. The server POSTs `{ "email": "...", "source":
+"thedotx.com" }` to it. Use this to push into a tool that has no direct API, via Zapier etc.
+
+> Both can be set at once. If neither is set, signups still succeed for the visitor and are
+> logged — but won't reach a durable list, so configure at least one before driving traffic.
 
 ## Updating the site later
 Edit files in `web/`, commit, then re-deploy (Deploy Branch in the dashboard, or
