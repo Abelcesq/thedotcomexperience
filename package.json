@@ -1,0 +1,15 @@
+{
+  "name": "thedotx-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Dot Com Experience — front door (static site served by Express on Heroku).",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
