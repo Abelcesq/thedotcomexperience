@@ -4,23 +4,25 @@
 > rhythm in `command-center.md`. A future portfolio-level manager reads this for a 30-second
 > roll-up.
 
-**Last updated:** 2026-06-27 · **Updated by:** Claude (PM) · **Phase:** 0→1 (container built; awaiting CEO review)
+**Last updated:** 2026-06-29 · **Updated by:** Claude (PM) · **Phase:** 1–2 (container built; front door built; building audience → Skool)
 
 ## Status at a glance
 | Pillar | State | Note |
 | --- | --- | --- |
 | Governance (`CLAUDE.md`) | 🟢 | Chain of command live: CEO decides, board advises, PM executes. |
-| Knowledge | 🟡 | Structure + brand + 9 board profiles done. CEO profile has `[TODO: CEO]` gaps. |
+| Knowledge | 🟢 | Structure + brand + 9 board profiles + canonical `foundation.md`. CEO profile has minor `[TODO]` gaps. |
 | Skills | 🟢 | `board-of-directors` + `continuously-improve` built and documented. |
 | Project docs | 🟢 | PROJECT / clarity / roadmap / command-center complete. |
-| Discoverability | 🟢 | `llms.txt` + `web/` assets drafted (deploy in Phase 3). |
-| Audience / list | 🔴 | None yet — Phase 2 priority. |
-| Offer / revenue | 🔴 | None yet — Phase 4. |
-| Owned platform | 🔴 | None yet — Phase 3. |
+| Discoverability | 🟢 | `llms.txt`, `robots.txt`, `sitemap.xml` + built front door with OG/JSON-LD. |
+| Front door (thedotx.com) | 🟢 | `web/index.html` built, renders, CTA → Skool. Awaiting domain + deploy (Phase 3). |
+| Community home (Skool) | 🟢 | Live: the-dot-comp-experience-1714. The funnel's destination. |
+| Audience / list | 🟡 | IG + X presence underway; no email capture yet — Phase 2. |
+| Offer / events | 🔴 | First in-person event not yet defined — the moat, Phase 3+. |
 
 ## Current focus
-**Phase 1 — Define the wedge.** Blocked on CEO answers to the open questions in
-[`clarity.md` §7](clarity.md).
+**Drive the funnel:** Instagram + X (awareness) → **thedotx.com** (front door, built) → **Skool**.
+Next concrete steps: deploy the front door to the domain, define the IG/X→Skool bridge, and
+scope the first local event.
 
 ## Top open decisions for the CEO
 1. First audience + the exact pain.

@@ -1,31 +1,41 @@
-# web/ — AI-Discoverable Site Assets (Step 6)
+# web/ — thedotx.com (the front door)
 
-Staging area for the public site's discoverability layer. These files are **drafted now** and
-**deployed in Phase 3** (see `../projects/the-dot-com-experience/roadmap.md`), once a domain
-and host are chosen.
+The owned one-page **front door** for The Dot Com Experience. Its single job: explain the
+movement and send the right people to the **Skool** community. This is the middle of the funnel:
+`Instagram + X (awareness) → thedotx.com (this page) → Skool (community + events)`.
 
-## What's here
-- [`robots.txt`](robots.txt) — welcomes all crawlers incl. AI bots; deploy at web root.
-- The canonical [`../llms.txt`](../llms.txt) — AI manifest; also serve at `https://<domain>/llms.txt`.
+## What's built
+- **`index.html`** — the live front door (cosmic theme, animated sigil + logo video, three-layer
+  story, philosophy tenets, and the primary CTA → Skool). ~54KB, self-contained except fonts.
+- **`assets/`**
+  - `dotx-cosmic-logo.mp4` — the hero cosmic logo animation.
+  - `hero-nebula.jpg` — hero background. `hero-poster.jpg` — video poster + social share image.
+  - `preview-hero.png` — a rendered preview screenshot (not used by the page).
+- **`robots.txt`**, **`sitemap.xml`**, **`llms.txt`** — discoverability (welcomes AI crawlers).
 
-## Discoverability checklist for the live site (Step 6 requirements)
-- [ ] **Clean semantic HTML** — real `<header>/<nav>/<main>/<article>/<footer>`, one `<h1>`,
-      logical heading order; content in markup, not baked into images.
-- [ ] **Clear meta descriptions** — unique `<title>` + `<meta name="description">` per page.
-- [ ] **Open Graph + Twitter cards** — for rich link previews when shared.
-- [ ] **`llms.txt` at root** — the AI manifest (already drafted).
-- [ ] **`robots.txt` at root** — already drafted; update the Sitemap domain.
-- [ ] **`sitemap.xml`** — generate on build.
-- [ ] **Structured data (JSON-LD)** — `Organization` / `Brand` schema for the movement.
-- [ ] **Fast, accessible, mobile-first** — performance and a11y aid both humans and crawlers.
-- [ ] **Canonical URLs + HTTPS** — one canonical home per page.
+## The one link that matters
+Primary CTA → **https://www.skool.com/the-dot-comp-experience-1714/about**
+(appears twice: hero "Join us on Skool" and closing "Enter the community").
+To change the community URL, edit both `href`s in `index.html`.
 
-## Platform-hub decision (deferred to Phase 3, decide with the board)
-Candidate stacks to weigh — pick for *quality + low maintenance + AI-readability*, not novelty:
-- **Static site** (e.g., Astro/Next static export) on a CDN host — fast, cheap, semantic, secure.
-- **No-code/low-code** (e.g., a premium site builder) — fastest to launch, less control.
-- **Headless CMS + static front end** — best for a growing content library.
+## Built-in AI discoverability (Step 6 — done)
+- Semantic HTML5 (`<header>`, `<section>`, `<article>`, `<footer>`, one `<h1>`).
+- Unique `<title>` + `<meta name="description">`; Open Graph + Twitter cards.
+- `<link rel="canonical">`; JSON-LD `Organization` schema (founder, slogan, Skool as `sameAs`).
+- `llms.txt`, `robots.txt` (AI bots allowed), `sitemap.xml`.
 
-> Security note: whatever the stack, secrets never live in the repo (`.gitignore` enforces a
-> baseline). Use a managed host with HTTPS, 2FA, least-privilege tokens, dependency scanning,
-> and backups. Full hardening is scoped in roadmap Phase 3.
+## How to preview locally
+Open `web/index.html` in a browser, or serve it: `python3 -m http.server -d web 8080`
+then visit `http://localhost:8080/`. (Fonts load from Google Fonts when online; system fonts
+are the fallback.)
+
+## How to deploy (Phase 3 — when ready)
+1. Buy/point **thedotx.com** to a static host (Cloudflare Pages, Netlify, GitHub Pages, Vercel).
+2. Upload the contents of `web/` to the site root (so `index.html`, `robots.txt`, `sitemap.xml`,
+   `llms.txt`, and `assets/` sit at the domain root).
+3. Confirm HTTPS, then validate: `/robots.txt`, `/sitemap.xml`, `/llms.txt`, and the rich-link
+   preview (paste the URL into a social composer to see the OG card).
+4. Optional next: a real video poster export, an email-capture form, and a favicon set.
+
+> Security note: no secrets live in this folder. Keep the host on HTTPS with 2FA; the repo's
+> root `.gitignore` enforces a secrets baseline.

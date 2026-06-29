@@ -4,7 +4,7 @@
 > purpose and values. Keep it accurate; ask the CEO to fill the gaps marked **[TODO: CEO]**.
 
 ## Identity
-- **Name:** Abel
+- **Name:** Abel Calderon, Jr.
 - **Email:** abelc.esq@gmail.com
 - **Role:** Founder & CEO of The Dot Com Experience. The captain of the ship — final say on
   purpose, direction, and desired results.

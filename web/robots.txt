@@ -18,6 +18,6 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-# Point crawlers to the sitemap and the AI manifest (update domain on deploy).
-Sitemap: https://REPLACE-WITH-DOMAIN/sitemap.xml
+# Point crawlers to the sitemap and the AI manifest.
+Sitemap: https://www.thedotx.com/sitemap.xml
 # See also: /llms.txt
