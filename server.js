@@ -11,16 +11,21 @@ const ROOT = path.join(__dirname, 'web');
 app.enable('trust proxy');
 app.use(express.json({ limit: '8kb' }));
 
-// Force HTTPS + canonical host (www) in production (behind Heroku's proxy).
+// Domains this site answers on. Each bare apex redirects to its own "www" host.
+// (Both domains serve the same site; the <link rel="canonical"> in index.html
+// points search engines to www.thedotx.com as the single SEO canonical.)
+const APEX_HOSTS = new Set(['thedotx.com', 'thedotcomexperience.com']);
+
+// Force HTTPS + apex→www in production (behind Heroku's proxy).
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'production') {
     const proto = req.headers['x-forwarded-proto'];
-    const host = req.headers.host || '';
+    const host = (req.headers.host || '').toLowerCase();
     if (proto && proto !== 'https') {
       return res.redirect(301, 'https://' + host + req.url);
     }
-    if (host === 'thedotx.com') {
-      return res.redirect(301, 'https://www.thedotx.com' + req.url);
+    if (APEX_HOSTS.has(host)) {
+      return res.redirect(301, 'https://www.' + host + req.url);
     }
   }
   next();
