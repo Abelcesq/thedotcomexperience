@@ -76,6 +76,29 @@ async function addToFlodesk(email) {
   }
 }
 
+// Push a subscriber into MailerLite via its API. Best-effort; logs the outcome.
+async function addToMailerLite(email) {
+  const key = process.env.MAILERLITE_API_KEY;
+  if (!key) return;
+  const body = { email };
+  if (process.env.MAILERLITE_GROUP_ID) body.groups = [process.env.MAILERLITE_GROUP_ID];
+  try {
+    const r = await fetch('https://connect.mailerlite.com/api/subscribers', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + key,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) console.error('[mailerlite] returned', r.status);
+    else console.log('[mailerlite] added', email);
+  } catch (e) {
+    console.error('[mailerlite] error:', e.message);
+  }
+}
+
 // POST to a generic webhook (Zapier/Make/Formspree/etc.). Best-effort.
 async function postWebhook(email) {
   const hook = process.env.SUBSCRIBE_WEBHOOK;
@@ -100,8 +123,8 @@ app.post('/api/subscribe', async (req, res) => {
   try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email}\n`); } catch (e) { /* best-effort */ }
   console.log('[subscribe]', email);
 
-  // Fan out to whatever destinations are configured (both run if set).
-  await Promise.allSettled([addToFlodesk(email), postWebhook(email)]);
+  // Fan out to whatever destinations are configured (all run if set).
+  await Promise.allSettled([addToMailerLite(email), addToFlodesk(email), postWebhook(email)]);
 
   // Always acknowledge the visitor; the email is logged even if a provider hiccups.
   return res.json({ ok: true });

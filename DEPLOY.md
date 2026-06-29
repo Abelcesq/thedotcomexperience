@@ -119,8 +119,19 @@ The page's email form POSTs to `/api/subscribe`. It works out of the box (emails
 and logged in `heroku logs --tail`), **but Heroku's disk is ephemeral**, so the local CSV isn't
 a real list. Point it at an ESP you own. Two supported ways (set via **Settings → Config Vars**):
 
-### Option 1 — Flodesk (recommended)
-Flat pricing (unlimited subscribers), premium templates, built-in automations + Stripe checkout.
+### Option 1 — MailerLite (recommended to start; FREE up to 1,000 subscribers)
+Free tier includes automation, forms, landing pages, and an API. Best cost-effective start.
+1. Create a MailerLite account (mailerlite.com — free, no card).
+2. Get your **API key**: Integrations → **API** (or Account → Integrations) → generate a token.
+3. (Optional) Create a **Group** (e.g. "Website Signups"); open it and copy its **Group ID** from
+   the URL or the group settings.
+4. In Heroku → app → **Settings → Reveal Config Vars**, add:
+   - `MAILERLITE_API_KEY` = `<your token>`
+   - `MAILERLITE_GROUP_ID` = `<group id>`  *(optional — omit to land everyone in the main list)*
+5. Dyno restarts automatically. Submit a test email on the live site → it appears in MailerLite.
+
+### Option 2 — Flodesk (premium, flat pricing — $35/mo, no free tier)
+Worth it later at scale: unlimited subscribers, premium templates, automations + Stripe checkout.
 1. Create a Flodesk account (flodesk.com — 30-day free trial, no card).
 2. In Flodesk, get your **API key**: Account → **Integrations / API** → copy the key.
 3. (Optional) Create a **Segment** (e.g. "Website Signups"). To find its ID, with your key run:
@@ -135,7 +146,7 @@ Flat pricing (unlimited subscribers), premium templates, built-in automations + 
 
 The server upserts each email into your Flodesk audience (and the segment), ready for campaigns.
 
-### Option 2 — Generic webhook (Zapier / Make / Formspree / Apps Script)
+### Option 3 — Generic webhook (Zapier / Make / Formspree / Apps Script)
 Add `SUBSCRIBE_WEBHOOK` = `<endpoint URL>`. The server POSTs `{ "email": "...", "source":
 "thedotx.com" }` to it. Use this to push into a tool that has no direct API, via Zapier etc.
 
