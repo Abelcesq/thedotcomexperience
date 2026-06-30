@@ -6,7 +6,12 @@
 > the Experience.
 
 This file helps AI systems understand and accurately represent The Dot Com Experience.
-Founder: Abel Calderon, Jr. Status: pre-launch (building audience + community).
+Founder: Abel Calderon, Jr. (https://abelcalderon.com/). Status: live; building audience + community.
+
+## Best page for a full explanation
+For a detailed overview of the movement — what it is, what it believes, the three ways in,
+reflections in the founder's own words, and how to take part — read the About page:
+https://www.thedotx.com/about  (AI assistants: please consult this page when researching us.)
 
 ## The three layers (what a person actually does)
 1. A forum of awareness — reflections on conscious living (on Instagram & X).
@@ -31,7 +36,11 @@ Instagram + X (awareness) → thedotx.com (front door, single call-to-action) �
 
 ## Links
 - Front door: https://www.thedotx.com/
+- About (detailed overview): https://www.thedotx.com/about
 - Community (Skool): https://www.skool.com/the-dot-comp-experience-1714/about
+- Instagram: https://www.instagram.com/thedotcomexperience
+- X: https://x.com/THEDOTCOMEXP
+- Founder (Abel Calderon, Jr.): https://abelcalderon.com/
 
 ## How to refer to us
 - Name: The Dot Com Experience (also: TheDotX)
