@@ -33,17 +33,17 @@ bridge (standard CTA + launch posts), and scope the first local event.
 5. Faith framing: explicit / friendly / universal.
 
 ## Recent activity
-- 2026-06-30 — **Welcome email LIVE** (server-sent via Resend): personalized, on-brand, landed
-  in inbox. First-name capture added to the form. *(Test mode — verify a Resend domain to send
-  to all subscribers, not just the account owner.)*
+- 2026-06-30 — **Welcome email PRODUCTION**: server-sent via Resend from a verified
+  `thedotcomexperience.com` (info@), personalized + on-brand, sends to ANY new subscriber.
+  Email hero matches the website. First-name capture live.
 - 2026-06-29 — **Front door LIVE** on Heroku with HTTPS across both domains (www.thedotx.com + www.thedotcomexperience.com); mind/body/spirit triad added; audience locked.
 - 2026-06-29 — Front door built; foundation context recorded; email capture added.
 - 2026-06-27 — Container built: structure, board (9), 2 skills, project docs, web assets.
 
 ## Next checkpoints
 - ✅ Email capture wired to an owned list (MailerLite) — verified live 2026-06-29.
-- ✅ Welcome email built + sending (server-sent via Resend), verified in inbox 2026-06-30.
-- ⬜ Verify a Resend domain (DNS in GoDaddy) → switch sender to info@thedotcomexperience.com → send to all subscribers (not just test address).
-- ⬜ Housekeeping: rotate the exposed MailerLite + Resend API keys; set NODE_ENV to lowercase `production`.
+- ✅ Welcome email built, domain-verified (Resend), sending from info@ to all subscribers — 2026-06-30.
+- ⬜ Housekeeping: rotate the exposed MailerLite + Resend API keys (regenerate + update Heroku).
+- ⬜ **Content** — IG/X launch posts + link-in-bio bridge to drive traffic to the live funnel.
 - ⬜ Define the IG/X → Skool bridge (standard CTA + 2–4 launch posts from the archive).
 - ⬜ Scope the first local event (city, format, the "experience of trust and stewardship").
