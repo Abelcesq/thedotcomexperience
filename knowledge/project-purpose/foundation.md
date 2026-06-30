@@ -25,13 +25,18 @@ for all of life is honored.
    *This is the heart of the movement and its strongest differentiator (the moat).*
 
 ## The human being — mind, body & spirit (anthropology)
-A human being is made of **three parts: mind, body, and soul/spirit.** Spirituality is a *real*
-aspect of human existence — not metaphor, not decoration — and, like the mind and the body, the
-spirit must be **nurtured**. To live fully ("Experience the Experience") is to consciously tend
-all three. This is held **non-denominationally**: spirituality is honored as universal to the
-human condition, open to people of any (or no) faith tradition. It is the third dimension the
-movement refuses to ignore in a culture that over-feeds the mind and the body while starving the
-spirit.
+Each of us is a **multi-sensory being** who experiences every moment through **mind, body, and
+spirit**: the mind (and how and what we think), the body (and the manner in which we care for
+it), and the spirit (and the ways we nurture it and seek to understand the magnitude of how we
+are a unique part of the non-physical as much as the physical). Most importantly, each of us is
+**responsible for ourselves and for everything around us, in every moment.** Spirituality is a
+*real* aspect of human existence, held **non-denominationally** — universal to the human
+condition, open to people of any (or no) faith tradition.
+
+**Core conviction:** even when the digital world may seem more impressive, **human connection** —
+and the effect it can have on the world — will always be significantly more impactful than any
+technological advance, and serves our call to **stewardship**. This is what The Dot Com
+Experience exists to remind us.
 
 ## Guiding philosophy
 We are mind, body & spirit — and the spirit is real and must be nurtured · Perspective shapes
