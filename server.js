@@ -70,7 +70,7 @@ async function sendWelcomeEmail(email, name) {
     .split('LOGO_URL').join(logo)
     .split('{$name}').join(escapeHtml(firstRaw))
     .split('{$unsubscribe}').join(unsub);
-  const from = process.env.WELCOME_FROM || 'The Dot Com Experience <onboarding@resend.dev>';
+  const from = process.env.WELCOME_FROM || 'The Dot Com Experience <info@thedotcomexperience.com>';
   const subject = 'Welcome to the Experience' + (name ? ', ' + firstRaw : '');
   try {
     const r = await fetch('https://api.resend.com/emails', {

@@ -165,13 +165,16 @@ when someone signs up — personalized with their first name. No MailerLite edit
 3. Create an **API key** (Resend → API Keys).
 4. In Heroku → app → **Settings → Reveal Config Vars**, add:
    - `RESEND_API_KEY` = `<your key>`
-   - `WELCOME_FROM` = `The Dot Com Experience <hello@thedotx.com>`  *(an address on your verified domain)*
+   - *(optional)* `WELCOME_FROM` — defaults to `The Dot Com Experience <info@thedotcomexperience.com>`;
+     set this only to use a different verified address.
    - *(optional)* `WELCOME_LOGO_URL` — defaults to `https://www.thedotx.com/assets/hero-poster.jpg`
-   - *(optional)* `WELCOME_UNSUBSCRIBE_URL` — defaults to a mailto unsubscribe
+   - *(optional)* `WELCOME_UNSUBSCRIBE_URL` — defaults to `mailto:info@thedotcomexperience.com`
 5. Redeploy. Submit a test signup → the welcome email arrives in that inbox.
 
-> Note: before your domain is verified you can only send to your own Resend account email
-> (Resend's `onboarding@resend.dev` test sender). Verify the domain to email real subscribers.
+> The sender defaults to **info@thedotcomexperience.com**, so verify **thedotcomexperience.com**
+> in Resend (step 2). For a quick test BEFORE the domain is verified, set
+> `WELCOME_FROM` = `onboarding@resend.dev` — but Resend's test sender only delivers to your own
+> Resend account email. Verify the domain to email real subscribers.
 > To edit the email's wording/design, change `content/email/welcome-email.html` and redeploy —
 > that's the whole loop, all in this repo.
 
