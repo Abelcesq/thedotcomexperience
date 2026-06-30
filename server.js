@@ -47,6 +47,44 @@ app.use((req, res, next) => {
 const SUBSCRIBE_FILE = process.env.SUBSCRIBE_FILE || path.join(os.tmpdir(), 'subscribers.csv');
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// --- Welcome email, sent by US via Resend (no external editor needed) ----
+// Enable by setting RESEND_API_KEY. WELCOME_FROM must be an address on a domain
+// you've verified in Resend (e.g. "The Dot Com Experience <hello@thedotx.com>").
+// The template is the on-brand HTML in content/email/welcome-email.html.
+let WELCOME_HTML = '';
+try {
+  WELCOME_HTML = fs.readFileSync(path.join(__dirname, 'content', 'email', 'welcome-email.html'), 'utf8');
+} catch (e) { console.error('[welcome] template not loaded:', e.message); }
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function sendWelcomeEmail(email, name) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !WELCOME_HTML) return;
+  const firstRaw = name || 'friend';
+  const logo = process.env.WELCOME_LOGO_URL || 'https://www.thedotx.com/assets/hero-poster.jpg';
+  const unsub = process.env.WELCOME_UNSUBSCRIBE_URL || 'mailto:info@thedotcomexperience.com?subject=Unsubscribe';
+  const html = WELCOME_HTML
+    .split('LOGO_URL').join(logo)
+    .split('{$name}').join(escapeHtml(firstRaw))
+    .split('{$unsubscribe}').join(unsub);
+  const from = process.env.WELCOME_FROM || 'The Dot Com Experience <onboarding@resend.dev>';
+  const subject = 'Welcome to the Experience' + (name ? ', ' + firstRaw : '');
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: email, subject, html }),
+    });
+    if (!r.ok) console.error('[welcome] resend returned', r.status, await r.text().catch(() => ''));
+    else console.log('[welcome] sent to', email);
+  } catch (e) {
+    console.error('[welcome] error:', e.message);
+  }
+}
+
 // Push a subscriber into Flodesk via its API. Best-effort; logs the outcome.
 async function addToFlodesk(email, name) {
   const key = process.env.FLODESK_API_KEY;
@@ -126,8 +164,13 @@ app.post('/api/subscribe', async (req, res) => {
   try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name}\n`); } catch (e) { /* best-effort */ }
   console.log('[subscribe]', email, name ? '(' + name + ')' : '');
 
-  // Fan out to whatever destinations are configured (all run if set).
-  await Promise.allSettled([addToMailerLite(email, name), addToFlodesk(email, name), postWebhook(email, name)]);
+  // Fan out: add to the list provider(s) AND send the welcome email (all run if set).
+  await Promise.allSettled([
+    addToMailerLite(email, name),
+    addToFlodesk(email, name),
+    postWebhook(email, name),
+    sendWelcomeEmail(email, name),
+  ]);
 
   // Always acknowledge the visitor; the email is logged even if a provider hiccups.
   return res.json({ ok: true });

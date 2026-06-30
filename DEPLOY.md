@@ -153,6 +153,28 @@ Add `SUBSCRIBE_WEBHOOK` = `<endpoint URL>`. The server POSTs `{ "email": "...", 
 > Both can be set at once. If neither is set, signups still succeed for the visitor and are
 > logged — but won't reach a durable list, so configure at least one before driving traffic.
 
+## F. Welcome email sent by your site (Resend) — no email editor needed
+Your server sends the on-brand welcome email (`content/email/welcome-email.html`) automatically
+when someone signs up — personalized with their first name. No MailerLite editor involved.
+(MailerLite still holds the list for future newsletters; Resend just sends the instant welcome.)
+
+1. Create a free account at **resend.com**.
+2. **Verify a sending domain** (Resend → Domains → Add `thedotx.com`). Resend shows DNS records
+   (SPF/DKIM/MX-ish `TXT` + `CNAME`s) — add them in GoDaddy. *(Screenshot them and I'll translate
+   to GoDaddy.)* This is required to send to real subscribers and to land in inboxes.
+3. Create an **API key** (Resend → API Keys).
+4. In Heroku → app → **Settings → Reveal Config Vars**, add:
+   - `RESEND_API_KEY` = `<your key>`
+   - `WELCOME_FROM` = `The Dot Com Experience <hello@thedotx.com>`  *(an address on your verified domain)*
+   - *(optional)* `WELCOME_LOGO_URL` — defaults to `https://www.thedotx.com/assets/hero-poster.jpg`
+   - *(optional)* `WELCOME_UNSUBSCRIBE_URL` — defaults to a mailto unsubscribe
+5. Redeploy. Submit a test signup → the welcome email arrives in that inbox.
+
+> Note: before your domain is verified you can only send to your own Resend account email
+> (Resend's `onboarding@resend.dev` test sender). Verify the domain to email real subscribers.
+> To edit the email's wording/design, change `content/email/welcome-email.html` and redeploy —
+> that's the whole loop, all in this repo.
+
 ## Updating the site later
 Edit files in `web/`, commit, then re-deploy (Deploy Branch in the dashboard, or
 `git push heroku <branch>:main` with the CLI). That's the whole loop.
