@@ -177,7 +177,14 @@ app.post('/api/subscribe', async (req, res) => {
 });
 
 // Serve static files (index.html, assets, robots.txt, sitemap.xml, llms.txt).
-app.use(express.static(ROOT, { extensions: ['html'], maxAge: '1h' }));
+app.use(express.static(ROOT, {
+  extensions: ['html'],
+  setHeaders: (res, filePath) => {
+    // HTML: always revalidate so deploys show immediately. Assets: cache 1h.
+    if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+    else res.setHeader('Cache-Control', 'public, max-age=3600');
+  },
+}));
 
 // Anything else → home.
 app.use((req, res) => res.redirect('/'));
