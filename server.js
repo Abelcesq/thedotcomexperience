@@ -48,16 +48,17 @@ const SUBSCRIBE_FILE = process.env.SUBSCRIBE_FILE || path.join(os.tmpdir(), 'sub
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Push a subscriber into Flodesk via its API. Best-effort; logs the outcome.
-async function addToFlodesk(email) {
+async function addToFlodesk(email, name) {
   const key = process.env.FLODESK_API_KEY;
   if (!key) return;
   // Flodesk uses HTTP Basic auth with the API key as the username.
   const auth = 'Basic ' + Buffer.from(key + ':').toString('base64');
   const headers = { Authorization: auth, 'Content-Type': 'application/json' };
+  const payload = name ? { email, first_name: name } : { email };
   try {
     // Upsert the subscriber (creates or updates by email).
     const r = await fetch('https://api.flodesk.com/v1/subscribers', {
-      method: 'POST', headers, body: JSON.stringify({ email }),
+      method: 'POST', headers, body: JSON.stringify(payload),
     });
     if (!r.ok) { console.error('[flodesk] subscriber upsert returned', r.status); return; }
 
@@ -77,10 +78,11 @@ async function addToFlodesk(email) {
 }
 
 // Push a subscriber into MailerLite via its API. Best-effort; logs the outcome.
-async function addToMailerLite(email) {
+async function addToMailerLite(email, name) {
   const key = process.env.MAILERLITE_API_KEY;
   if (!key) return;
   const body = { email };
+  if (name) body.fields = { name };
   if (process.env.MAILERLITE_GROUP_ID) body.groups = [process.env.MAILERLITE_GROUP_ID];
   try {
     const r = await fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -100,14 +102,14 @@ async function addToMailerLite(email) {
 }
 
 // POST to a generic webhook (Zapier/Make/Formspree/etc.). Best-effort.
-async function postWebhook(email) {
+async function postWebhook(email, name) {
   const hook = process.env.SUBSCRIBE_WEBHOOK;
   if (!hook) return;
   try {
     const r = await fetch(hook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ email, source: 'thedotx.com' }),
+      body: JSON.stringify({ email, name: name || '', source: 'thedotx.com' }),
     });
     if (!r.ok) console.error('[subscribe] webhook returned', r.status);
   } catch (e) {
@@ -117,14 +119,15 @@ async function postWebhook(email) {
 
 app.post('/api/subscribe', async (req, res) => {
   const email = ((req.body && req.body.email) || '').toString().trim().toLowerCase();
+  const name = ((req.body && req.body.name) || '').toString().trim().slice(0, 100);
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return res.status(400).json({ ok: false, error: 'Please enter a valid email.' });
   }
-  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email}\n`); } catch (e) { /* best-effort */ }
-  console.log('[subscribe]', email);
+  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name}\n`); } catch (e) { /* best-effort */ }
+  console.log('[subscribe]', email, name ? '(' + name + ')' : '');
 
   // Fan out to whatever destinations are configured (all run if set).
-  await Promise.allSettled([addToMailerLite(email), addToFlodesk(email), postWebhook(email)]);
+  await Promise.allSettled([addToMailerLite(email, name), addToFlodesk(email, name), postWebhook(email, name)]);
 
   // Always acknowledge the visitor; the email is logged even if a provider hiccups.
   return res.json({ ok: true });

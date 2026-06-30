@@ -113,9 +113,9 @@ footer{padding:3.4rem 0 4rem;text-align:center;border-top:1px solid var(--line);
 .capture h2{font-size:clamp(1.5rem,4.5vw,2.4rem);font-weight:700;margin-bottom:.7rem;}
 .capture .sub{color:var(--muted);max-width:40ch;margin:0 auto 2rem;}
 .cap-form{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;max-width:520px;margin:0 auto;}
-.cap-form input[type=email]{flex:1 1 260px;min-width:0;padding:1rem 1.2rem;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);font-family:"Inter",sans-serif;font-size:1rem;}
-.cap-form input[type=email]::placeholder{color:var(--muted);}
-.cap-form input[type=email]:focus{outline:none;border-color:var(--denim);box-shadow:0 0 0 3px rgba(91,143,185,.22);}
+.cap-form input{flex:1 1 220px;min-width:0;padding:1rem 1.2rem;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);font-family:"Inter",sans-serif;font-size:1rem;}
+.cap-form input::placeholder{color:var(--muted);}
+.cap-form input:focus{outline:none;border-color:var(--denim);box-shadow:0 0 0 3px rgba(91,143,185,.22);}
 .cap-form button{border:none;cursor:pointer;}
 .cap-note{margin-top:1rem;color:var(--muted);font-size:.8rem;}
 .cap-msg{margin-top:1.1rem;font-family:"Poppins",sans-serif;font-weight:600;min-height:1.2em;}
@@ -200,6 +200,8 @@ footer{padding:3.4rem 0 4rem;text-align:center;border-top:1px solid var(--line);
   <h2>Get the reflections by email</h2>
   <p class="sub">Not ready to join yet? Leave your email and we&rsquo;ll send a note when something worth your attention is published. No noise.</p>
   <form class="cap-form" id="capform" novalidate>
+    <label for="capname" class="sr-only" style="position:absolute;left:-9999px;">First name</label>
+    <input type="text" id="capname" name="name" placeholder="First name" autocomplete="given-name" maxlength="100">
     <label for="capemail" class="sr-only" style="position:absolute;left:-9999px;">Email address</label>
     <input type="email" id="capemail" name="email" placeholder="you@example.com" required autocomplete="email">
     <button type="submit" class="btn">Keep me posted <span class="arrow">&rarr;</span></button>
@@ -256,14 +258,14 @@ footer{padding:3.4rem 0 4rem;text-align:center;border-top:1px solid var(--line);
 // email capture
 (function(){
   var f=document.getElementById('capform'); if(!f)return;
-  var inp=document.getElementById('capemail'), msg=document.getElementById('capmsg'), btn=f.querySelector('button');
+  var inp=document.getElementById('capemail'), nameInp=document.getElementById('capname'), msg=document.getElementById('capmsg'), btn=f.querySelector('button');
   function set(t,cls){msg.textContent=t;msg.className='cap-msg '+(cls||'');}
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var email=(inp.value||'').trim();
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){set('Please enter a valid email.','err');inp.focus();return;}
     btn.disabled=true; set('One moment…','');
-    fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})})
+    fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,name:((nameInp&&nameInp.value)||'').trim()})})
       .then(function(r){return r.json().catch(function(){return {ok:r.ok};});})
       .then(function(d){
         if(d&&d.ok){f.reset();set('You’re on the list. Welcome — Experience the Experience.','ok');}
