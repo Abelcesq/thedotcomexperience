@@ -1,5 +1,42 @@
 # Welcome Email — copy deck (paste into MailerLite)
 
+---
+
+## ⚡ SIMPLEST BUILD (ignore the fancy template — use 4 blocks)
+Don't use the busy podcasting template. In MailerLite: **Start from scratch → Blank canvas**
+(or the "Simple emails" category). Add just **four blocks**, top to bottom:
+
+1. **Image block** → upload the static cosmic logo.
+2. **Text block** → paste this whole letter as one piece:
+
+> Hi {$name},
+>
+> Welcome to The Dot Com Experience — a movement for conscious living. You just did something
+> most people never do: you chose to live deliberately, not by default. That choice is the
+> beginning of directing "the experience!"
+>
+> Life is meant to be experienced — consciously, and not alone. Here's what that looks like
+> with us:
+>
+> • Reflections to live by — practical ideas on identity, perspective, responsibility, love,
+>   and stewardship. We are mind, body, and spirit, and all three are worth tending.
+> • A community of kindred minds — a home on Skool for people who take these questions
+>   seriously. Meet others, share the journey, and belong.
+> • Real, in-person experiences — monthly gatherings built on genuine trust and stewardship.
+>   The heart of the movement.
+>
+> The community lives on Skool — come inside.
+
+3. **Button block** → text "Step inside on Skool", link to the Skool URL below.
+4. **Text block** → "Follow along daily: Instagram (link) · X (link)" then:
+   *Experience the Experience. — Abel, Founder*
+
+For `{$name}`: click the personalization tag, set default = `friend`. MailerLite adds the
+unsubscribe + address footer automatically.
+
+---
+
+
 > The first email every new subscriber receives. Triggered by the "Website Welcome" automation
 > (trigger: joins the group your site adds people to). Brand voice; ends with *Experience the
 > Experience.* Personalization uses the first name we now collect on the site form.
@@ -40,7 +77,7 @@ Hi {$name},
 
 Welcome to **The Dot Com Experience** — a movement for conscious living. You just did
 something most people never do: you chose to live *deliberately*, not by default. That choice
-is the whole beginning.
+is the beginning of directing "the experience!"
 
 Life is meant to be experienced — consciously, and not alone. Here's what that looks like with
 us, and how to take your next step.
