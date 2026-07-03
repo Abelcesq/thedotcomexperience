@@ -70,27 +70,35 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Enable by setting RESEND_API_KEY. WELCOME_FROM must be an address on a domain
 // you've verified in Resend (e.g. "The Dot Com Experience <hello@thedotx.com>").
 // The template is the on-brand HTML in content/email/welcome-email.html.
-let WELCOME_HTML = '';
-try {
-  WELCOME_HTML = fs.readFileSync(path.join(__dirname, 'content', 'email', 'welcome-email.html'), 'utf8');
-} catch (e) { console.error('[welcome] template not loaded:', e.message); }
+function loadTemplate(file) {
+  try { return fs.readFileSync(path.join(__dirname, 'content', 'email', file), 'utf8'); }
+  catch (e) { console.error('[welcome] template not loaded:', file, e.message); return ''; }
+}
+const WELCOME_HTML = loadTemplate('welcome-email.html');            // The Dot Com Experience (thedotx.com)
+const WELCOME_HTML_ABEL = loadTemplate('welcome-abelcalderon.html'); // My Path to Me (abelcalderon.com)
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-async function sendWelcomeEmail(email, name) {
+async function sendWelcomeEmail(email, name, source) {
   const key = process.env.RESEND_API_KEY;
-  if (!key || !WELCOME_HTML) return;
+  if (!key) return;
+  // Pick the welcome variant by signup source.
+  const isAbel = /abelcalderon/i.test(source || '');
+  const template = isAbel && WELCOME_HTML_ABEL ? WELCOME_HTML_ABEL : WELCOME_HTML;
+  if (!template) return;
   const firstRaw = name || 'friend';
   const logo = process.env.WELCOME_LOGO_URL || 'https://www.thedotx.com/assets/hero-poster.jpg';
   const unsub = process.env.WELCOME_UNSUBSCRIBE_URL || 'mailto:info@thedotcomexperience.com?subject=Unsubscribe';
-  const html = WELCOME_HTML
+  const html = template
     .split('LOGO_URL').join(logo)
     .split('{$name}').join(escapeHtml(firstRaw))
     .split('{$unsubscribe}').join(unsub);
-  const from = process.env.WELCOME_FROM || 'The Dot Com Experience <info@thedotcomexperience.com>';
-  const subject = 'Welcome to the Experience' + (name ? ', ' + firstRaw : '');
+  const from = isAbel
+    ? (process.env.WELCOME_FROM_ABEL || 'Abel Calderon · My Path to Me <info@thedotcomexperience.com>')
+    : (process.env.WELCOME_FROM || 'The Dot Com Experience <info@thedotcomexperience.com>');
+  const subject = (isAbel ? 'Welcome to My Path to Me' : 'Welcome to the Experience') + (name ? ', ' + firstRaw : '');
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -192,7 +200,7 @@ app.post('/api/subscribe', async (req, res) => {
     addToMailerLite(email, name, source),
     addToFlodesk(email, name),
     postWebhook(email, name),
-    sendWelcomeEmail(email, name),
+    sendWelcomeEmail(email, name, source),
   ]);
 
   // Always acknowledge the visitor; the email is logged even if a provider hiccups.
