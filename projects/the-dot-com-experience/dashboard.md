@@ -33,6 +33,12 @@ bridge (standard CTA + launch posts), and scope the first local event.
 5. Faith framing: explicit / friendly / universal.
 
 ## Recent activity
+- 2026-07-03 — **Multi-site funnel**: abelcalderon.com (Squarespace) can now feed the same
+  funnel (CORS + `source` tag). New source-aware welcome — abelcalderon.com signups get a
+  "My Path to Me" email inviting them into the community; thedotx signups get the Dot Com
+  welcome. Ask-AI links added to both emails. Handoff doc delivered for the Squarespace thread.
+- 2026-07-03 — Website + About + emails + llms updated: multi-sensory mind/body/spirit passage;
+  "human connection > technology → stewardship"; Gemini Ask-AI fixed (Google AI Mode).
 - 2026-06-30 — **Welcome email PRODUCTION**: server-sent via Resend from a verified
   `thedotcomexperience.com` (info@), personalized + on-brand, sends to ANY new subscriber.
   Email hero matches the website. First-name capture live.
