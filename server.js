@@ -11,6 +11,25 @@ const ROOT = path.join(__dirname, 'web');
 app.enable('trust proxy');
 app.use(express.json({ limit: '8kb' }));
 
+// CORS for the public subscribe API so our other sites (e.g. abelcalderon.com) can
+// POST to it cross-origin. Only these origins are allowed.
+const ALLOWED_ORIGINS = new Set([
+  'https://www.thedotx.com', 'https://thedotx.com',
+  'https://www.thedotcomexperience.com', 'https://thedotcomexperience.com',
+  'https://www.abelcalderon.com', 'https://abelcalderon.com',
+]);
+app.use('/api/', (req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 // Domains this site answers on. Each bare apex redirects to its own "www" host.
 // (Both domains serve the same site; the <link rel="canonical"> in index.html
 // points search engines to www.thedotx.com as the single SEO canonical.)
@@ -116,11 +135,14 @@ async function addToFlodesk(email, name) {
 }
 
 // Push a subscriber into MailerLite via its API. Best-effort; logs the outcome.
-async function addToMailerLite(email, name) {
+async function addToMailerLite(email, name, source) {
   const key = process.env.MAILERLITE_API_KEY;
   if (!key) return;
   const body = { email };
-  if (name) body.fields = { name };
+  const fields = {};
+  if (name) fields.name = name;
+  if (source) fields.source = source;               // which site the signup came from
+  if (Object.keys(fields).length) body.fields = fields;
   if (process.env.MAILERLITE_GROUP_ID) body.groups = [process.env.MAILERLITE_GROUP_ID];
   try {
     const r = await fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -158,15 +180,16 @@ async function postWebhook(email, name) {
 app.post('/api/subscribe', async (req, res) => {
   const email = ((req.body && req.body.email) || '').toString().trim().toLowerCase();
   const name = ((req.body && req.body.name) || '').toString().trim().slice(0, 100);
+  const source = ((req.body && req.body.source) || 'thedotx.com').toString().trim().slice(0, 60);
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return res.status(400).json({ ok: false, error: 'Please enter a valid email.' });
   }
-  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name}\n`); } catch (e) { /* best-effort */ }
-  console.log('[subscribe]', email, name ? '(' + name + ')' : '');
+  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name},${source}\n`); } catch (e) { /* best-effort */ }
+  console.log('[subscribe]', email, name ? '(' + name + ')' : '', 'src:' + source);
 
   // Fan out: add to the list provider(s) AND send the welcome email (all run if set).
   await Promise.allSettled([
-    addToMailerLite(email, name),
+    addToMailerLite(email, name, source),
     addToFlodesk(email, name),
     postWebhook(email, name),
     sendWelcomeEmail(email, name),

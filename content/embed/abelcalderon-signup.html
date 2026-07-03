@@ -1,0 +1,65 @@
+<!--
+  The Dot Com Experience — email signup embed for abelcalderon.com
+  ---------------------------------------------------------------
+  Paste this whole block into a "Custom HTML" / "Embed" / "Code" block on
+  abelcalderon.com. It posts to your existing Heroku funnel, so the subscriber
+  lands in the same MailerLite list AND gets the same Resend welcome email
+  (which directs them to the Skool community). Tagged with source=abelcalderon.com
+  so you can tell where each signup came from in MailerLite (the "source" field).
+
+  Styling is self-contained and scoped to .dcx-signup so it won't clash with your
+  site. Tweak the colors/labels below to taste.
+-->
+<div class="dcx-signup">
+  <style>
+    .dcx-signup{max-width:520px;margin:1rem auto;font-family:inherit;text-align:center;}
+    .dcx-signup h3{margin:0 0 .4rem;font-size:1.4rem;font-weight:700;}
+    .dcx-signup p.dcx-sub{margin:0 0 1.1rem;opacity:.75;font-size:.98rem;}
+    .dcx-signup form{display:flex;gap:.55rem;flex-wrap:wrap;justify-content:center;}
+    .dcx-signup input{flex:1 1 200px;min-width:0;padding:.85rem 1.1rem;border-radius:999px;
+      border:1px solid rgba(140,140,140,.4);background:rgba(255,255,255,.06);color:inherit;font-size:1rem;font-family:inherit;}
+    .dcx-signup input::placeholder{opacity:.6;}
+    .dcx-signup input:focus{outline:none;border-color:#d9b85a;box-shadow:0 0 0 3px rgba(217,184,90,.25);}
+    .dcx-signup button{border:none;cursor:pointer;padding:.85rem 1.6rem;border-radius:999px;font-weight:700;font-size:1rem;
+      font-family:inherit;color:#1a1206;background:linear-gradient(120deg,#b38728,#d9b85a 40%,#fbf5b7 60%,#aa771c);}
+    .dcx-signup button:hover{filter:brightness(1.05);}
+    .dcx-signup .dcx-msg{margin-top:.9rem;font-weight:600;min-height:1.1em;font-size:.95rem;}
+    .dcx-signup .dcx-msg.ok{color:#2e9e78;} .dcx-signup .dcx-msg.err{color:#d15b5b;}
+    .dcx-signup .dcx-note{margin-top:.7rem;opacity:.6;font-size:.78rem;}
+  </style>
+
+  <h3>Experience the Experience</h3>
+  <p class="dcx-sub">Join the movement for conscious living. Leave your email and we&rsquo;ll send you in.</p>
+
+  <form id="dcxForm" novalidate>
+    <input type="text" id="dcxName" name="name" placeholder="First name" autocomplete="given-name" maxlength="100">
+    <input type="email" id="dcxEmail" name="email" placeholder="you@example.com" required autocomplete="email">
+    <button type="submit">Keep me posted &rarr;</button>
+  </form>
+  <p class="dcx-msg" id="dcxMsg" role="status" aria-live="polite"></p>
+  <p class="dcx-note">We&rsquo;ll never share your email. Unsubscribe anytime.</p>
+
+  <script>
+  (function(){
+    var f=document.getElementById('dcxForm'); if(!f)return;
+    var email=document.getElementById('dcxEmail'), name=document.getElementById('dcxName'),
+        msg=document.getElementById('dcxMsg'), btn=f.querySelector('button');
+    function set(t,c){msg.textContent=t;msg.className='dcx-msg '+(c||'');}
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var em=(email.value||'').trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){set('Please enter a valid email.','err');email.focus();return;}
+      btn.disabled=true; set('One moment…','');
+      fetch('https://www.thedotx.com/api/subscribe',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:em,name:((name&&name.value)||'').trim(),source:'abelcalderon.com'})
+      })
+      .then(function(r){return r.json().catch(function(){return {ok:r.ok};});})
+      .then(function(d){ if(d&&d.ok){f.reset();set('You’re on the list. Welcome — Experience the Experience.','ok');}
+        else {set((d&&d.error)||'Something went wrong. Please try again.','err');} })
+      .catch(function(){set('Network error. Please try again.','err');})
+      .finally(function(){btn.disabled=false;});
+    });
+  })();
+  </script>
+</div>
