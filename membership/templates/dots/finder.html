@@ -24,10 +24,12 @@
     var data = [];
     try { data = JSON.parse(document.getElementById('map-dots-data').textContent) || []; } catch(e){}
     var WORLD = [[-85,-180],[85,180]];
-    var map = L.map('dotmap', { scrollWheelZoom:false, minZoom:2, maxZoom:16,
+    var MAPTILER_KEY = 'zuvQykS1TdDkbRHj5vHp';
+    var map = L.map('dotmap', { scrollWheelZoom:false, minZoom:2, maxZoom:18,
       maxBounds:WORLD, maxBoundsViscosity:1.0 }).setView([39.5,-98.35], 4);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-      { minZoom:2, maxZoom:16, noWrap:true, bounds:WORLD, attribution:'Tiles &copy; Esri' }).addTo(map);
+    L.tileLayer('https://api.maptiler.com/maps/darkmatter/256/{z}/{x}/{y}.png?key=' + MAPTILER_KEY,
+      { minZoom:2, maxZoom:18, noWrap:true, bounds:WORLD, crossOrigin:true,
+        attribution:'© <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
     var pts = [];
     data.forEach(function(d){
       var icon = L.divIcon({ className:'dot-marker',

@@ -194,8 +194,6 @@
     border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.35)}
   #dotmap{height:100%;width:100%;background:#060e1d}
   .leaflet-container{font-family:var(--font-body);background:#060e1d}
-  /* tint the grey basemap toward brand navy for the cosmic look */
-  #dotmap .leaflet-tile-pane{filter:brightness(.82) contrast(1.05) saturate(2.3) sepia(.65) hue-rotate(186deg)}
   .dot-marker{position:relative;width:32px;height:32px}
   .dot-marker .count{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;
     width:32px;height:32px;border-radius:50%;
@@ -494,10 +492,12 @@
     if(!el || typeof L === 'undefined') return;
     var FALLBACK = [{ city:'Sacramento, CA', lat:38.5816, lng:-121.4944, status:'Forming', count:1 }];
     var WORLD = [[-85,-180],[85,180]];
-    var map = L.map('dotmap', { scrollWheelZoom:false, minZoom:2, maxZoom:16,
+    var MAPTILER_KEY = 'zuvQykS1TdDkbRHj5vHp';
+    var map = L.map('dotmap', { scrollWheelZoom:false, minZoom:2, maxZoom:18,
       maxBounds:WORLD, maxBoundsViscosity:1.0 }).setView([39.5,-98.35], 4);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-      { minZoom:2, maxZoom:16, noWrap:true, bounds:WORLD, attribution:'Tiles &copy; Esri' }).addTo(map);
+    L.tileLayer('https://api.maptiler.com/maps/darkmatter/256/{z}/{x}/{y}.png?key=' + MAPTILER_KEY,
+      { minZoom:2, maxZoom:18, noWrap:true, bounds:WORLD, crossOrigin:true,
+        attribution:'© <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
     function addDot(d){
       var icon = L.divIcon({ className:'dot-marker',
         html:'<span class="pulse"></span><span class="count">'+(d.count||1)+'</span>',
