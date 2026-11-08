@@ -143,13 +143,15 @@ async function addToFlodesk(email, name) {
 }
 
 // Push a subscriber into MailerLite via its API. Best-effort; logs the outcome.
-async function addToMailerLite(email, name, source) {
+async function addToMailerLite(email, name, source, extra) {
   const key = process.env.MAILERLITE_API_KEY;
   if (!key) return;
   const body = { email };
   const fields = {};
   if (name) fields.name = name;
   if (source) fields.source = source;               // which site the signup came from
+  if (extra && extra.city) fields.city = extra.city;        // for Dot (local circle) matching
+  if (extra && extra.intent) fields.intent = extra.intent;  // join | start a Dot
   if (Object.keys(fields).length) body.fields = fields;
   if (process.env.MAILERLITE_GROUP_ID) body.groups = [process.env.MAILERLITE_GROUP_ID];
   try {
@@ -189,15 +191,17 @@ app.post('/api/subscribe', async (req, res) => {
   const email = ((req.body && req.body.email) || '').toString().trim().toLowerCase();
   const name = ((req.body && req.body.name) || '').toString().trim().slice(0, 100);
   const source = ((req.body && req.body.source) || 'thedotx.com').toString().trim().slice(0, 60);
+  const city = ((req.body && req.body.city) || '').toString().trim().slice(0, 120);
+  const intent = ((req.body && req.body.intent) || '').toString().trim().slice(0, 20);
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return res.status(400).json({ ok: false, error: 'Please enter a valid email.' });
   }
-  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name},${source}\n`); } catch (e) { /* best-effort */ }
-  console.log('[subscribe]', email, name ? '(' + name + ')' : '', 'src:' + source);
+  try { fs.appendFileSync(SUBSCRIBE_FILE, `${new Date().toISOString()},${email},${name},${source},${city},${intent}\n`); } catch (e) { /* best-effort */ }
+  console.log('[subscribe]', email, name ? '(' + name + ')' : '', 'src:' + source, city ? 'city:' + city : '', intent ? 'intent:' + intent : '');
 
   // Fan out: add to the list provider(s) AND send the welcome email (all run if set).
   await Promise.allSettled([
-    addToMailerLite(email, name, source),
+    addToMailerLite(email, name, source, { city, intent }),
     addToFlodesk(email, name),
     postWebhook(email, name),
     sendWelcomeEmail(email, name, source),
