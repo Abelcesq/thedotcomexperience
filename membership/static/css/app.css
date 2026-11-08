@@ -71,17 +71,23 @@ input:focus,textarea:focus{outline:2px solid var(--gold-solid);outline-offset:1p
 .dot-result{border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.3rem;margin:.8rem 0;background:rgba(255,255,255,.02)}
 .dot-result h3{font-size:1.1rem;color:#fff;margin-bottom:.3rem}
 .muted{color:var(--muted)}
-/* Find-a-Dot map (static world image + pins) */
-.dotmap-static{position:relative;margin:1rem 0 .4rem;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.35);background:#060e1d;line-height:0}
-.dotmap-static img{display:block;width:100%;height:auto}
-.dot-pin{position:absolute;transform:translate(-50%,-50%);width:30px;height:30px;padding:0;border:0;background:none}
-.dot-pin .count{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#fbf0c9,#d9b85a 60%,#b38728);color:#241803;font-weight:800;font-size:.9rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.6)}
-.dot-pin .pulse{position:absolute;inset:-7px;z-index:1;border-radius:50%;border:2px solid rgba(217,184,90,.7);animation:dotpulse 2.6s ease-out infinite}
-@keyframes dotpulse{0%{transform:scale(.6);opacity:.85}100%{transform:scale(1.6);opacity:0}}
-.dot-pin .pin-label{position:absolute;left:50%;top:-30px;transform:translateX(-50%);white-space:nowrap;z-index:3;
-  background:rgba(8,16,30,.94);border:1px solid var(--line);color:var(--ink);font-size:.72rem;font-weight:600;padding:4px 9px;border-radius:7px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
-.dot-pin .pin-label::after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%) rotate(45deg);width:8px;height:8px;background:rgba(8,16,30,.94);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+/* Find-a-Dot interactive map (dark, cosmic) */
+.map-wrap{position:relative;height:440px;margin:1rem 0 .4rem;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+#dotmap{height:100%;width:100%;background:#060e1d}
+.leaflet-container{font-family:"Inter",sans-serif;background:#060e1d}
+#dotmap .leaflet-tile-pane{filter:brightness(.92) saturate(1.3) sepia(.35) hue-rotate(176deg)}
+.dot-marker{position:relative;width:32px;height:32px}
+.dot-marker .count{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fbf0c9,#d9b85a 60%,#b38728);color:#241803;font-weight:800;font-size:.9rem;border:2px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.6);cursor:pointer}
+.dot-marker .pulse{position:absolute;inset:-7px;z-index:1;border-radius:50%;border:2px solid rgba(217,184,90,.75);animation:dotpulse 2.6s ease-out infinite}
+@keyframes dotpulse{0%{transform:scale(.6);opacity:.85}100%{transform:scale(1.7);opacity:0}}
+.leaflet-popup-content-wrapper{background:#0c1f36;color:var(--ink);border:1px solid var(--line);border-radius:12px}
+.leaflet-popup-tip{background:#0c1f36}
+.leaflet-popup-content{margin:12px 14px;font-size:.9rem;line-height:1.5}
+.leaflet-popup-content b{color:#fff}
+.leaflet-control-zoom a{background:#0c1f36;color:var(--ink);border-color:var(--line)}
+.leaflet-control-zoom a:hover{background:#13233b}
+@media(max-width:640px){.map-wrap{height:340px}}
 footer{padding:2.4rem 0 3rem;text-align:center}
 .foot-url{color:var(--muted);font-size:.82rem}
 .foot-url a{color:var(--muted);text-decoration:none}

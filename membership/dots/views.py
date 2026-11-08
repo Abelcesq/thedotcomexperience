@@ -1,9 +1,32 @@
 from django.contrib import messages
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 from .forms import DotApplicationForm, DotFinderForm, WaitlistForm
 from .models import Dot
+
+
+def _dots_with_coords():
+    """Every Dot that has coordinates and isn't paused — the markers for the maps."""
+    out = []
+    qs = Dot.objects.exclude(lat__isnull=True).exclude(lng__isnull=True).exclude(status=Dot.Status.PAUSED)
+    for d in qs:
+        label = d.city + (", " + d.region if d.region else "")
+        out.append({
+            "city": label, "lat": d.lat, "lng": d.lng,
+            "status": d.get_status_display(), "count": 1,
+        })
+    return out
+
+
+def dots_data(request):
+    """Public JSON of current Dots, for the interactive maps (home page fetches it
+    cross-origin; the members finder renders it server-side). Read-only, no secrets."""
+    resp = JsonResponse({"dots": _dots_with_coords()})
+    resp["Access-Control-Allow-Origin"] = "*"   # public, read-only data
+    resp["Cache-Control"] = "public, max-age=120"
+    return resp
 
 
 def home(request):
@@ -23,13 +46,7 @@ def dots_finder(request):
         ).exclude(status=Dot.Status.PAUSED)
 
     # Markers for the interactive map: every Dot that has coordinates.
-    map_dots = []
-    for d in Dot.objects.exclude(lat__isnull=True).exclude(lng__isnull=True):
-        label = d.city + (", " + d.region if d.region else "")
-        map_dots.append({
-            "city": label, "lat": d.lat, "lng": d.lng,
-            "count": 1, "status": d.get_status_display(),
-        })
+    map_dots = _dots_with_coords()
 
     waitlist_form = WaitlistForm(initial={"city": query} if query else None)
     return render(request, "dots/finder.html", {
