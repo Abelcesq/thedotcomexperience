@@ -1,3 +1,5 @@
+import re
+
 from allauth.account.forms import SignupForm
 from django import forms
 from django.utils import timezone
@@ -55,19 +57,27 @@ class ProfileForm(forms.ModelForm):
         }
         help_texts = {
             "city": "Used to match you to a local Dot.",
-            "phone": "Optional. Use international format, e.g. +13105551234.",
+            "phone": "Optional. Pick your country, then enter your number — we store it in international format.",
             "sms_opt_in": "We only text if you opt in, and you can reply STOP anytime.",
         }
         widgets = {
-            "phone": forms.TextInput(attrs={"placeholder": "+13105551234"}),
+            "phone": forms.TextInput(attrs={"placeholder": "Phone number", "type": "tel",
+                                            "autocomplete": "tel"}),
             "city": forms.TextInput(attrs={"placeholder": "e.g. Los Angeles"}),
         }
 
     def clean_phone(self):
         phone = (self.cleaned_data.get("phone") or "").strip()
-        if phone and (not phone.startswith("+") or not phone[1:].isdigit() or len(phone) < 8):
-            raise forms.ValidationError("Enter a valid phone in international format, e.g. +13105551234.")
-        return phone
+        if not phone:
+            return phone
+        # The country picker submits E.164 (+<country><number>). Strip any stray
+        # formatting (spaces, parens, dashes) just in case, then validate.
+        cleaned = re.sub(r"[\s()\-.]", "", phone)
+        if not re.fullmatch(r"\+\d{8,15}", cleaned):
+            raise forms.ValidationError(
+                "Enter a valid phone number in international format, e.g. +13105551234."
+            )
+        return cleaned
 
     def clean(self):
         cleaned = super().clean()

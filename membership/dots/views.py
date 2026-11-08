@@ -22,9 +22,19 @@ def dots_finder(request):
             Q(city__icontains=query) | Q(region__icontains=query)
         ).exclude(status=Dot.Status.PAUSED)
 
+    # Markers for the interactive map: every Dot that has coordinates.
+    map_dots = []
+    for d in Dot.objects.exclude(lat__isnull=True).exclude(lng__isnull=True):
+        label = d.city + (", " + d.region if d.region else "")
+        map_dots.append({
+            "city": label, "lat": d.lat, "lng": d.lng,
+            "count": 1, "status": d.get_status_display(),
+        })
+
     waitlist_form = WaitlistForm(initial={"city": query} if query else None)
     return render(request, "dots/finder.html", {
-        "form": form, "results": results, "query": query, "waitlist_form": waitlist_form,
+        "form": form, "results": results, "query": query,
+        "waitlist_form": waitlist_form, "map_dots": map_dots,
     })
 
 

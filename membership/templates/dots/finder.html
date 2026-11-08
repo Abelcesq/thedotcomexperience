@@ -1,11 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Find a Dot — The Dot Com Experience{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
 <section class="hero">
   <span class="eyebrow">Find a Dot</span>
   <h1>Find your <span class="gold">Dot</span></h1>
   <p>Search by city. If there isn't one near you yet, add your name — or request a new Dot location and apply to lead it.</p>
 </section>
+
+<!-- Interactive map of current Dots -->
+<div class="map-wrap"><div id="dotmap" aria-label="Map of Dot locations"></div></div>
+<p class="muted" style="margin:.2rem 0 1.4rem">
+  {% if map_dots %}{{ map_dots|length }} Dot{{ map_dots|length|pluralize }} on the map.{% else %}Dots will appear here as they form.{% endif %}
+  No Dot near you? <a href="{% url 'request_dot' %}">Request a new location</a>.
+</p>
+{{ map_dots|json_script:"map-dots-data" }}
+<script>
+  window.addEventListener('DOMContentLoaded', function(){
+    var el = document.getElementById('dotmap');
+    if(!el || typeof L === 'undefined') return;
+    var data = [];
+    try { data = JSON.parse(document.getElementById('map-dots-data').textContent) || []; } catch(e){}
+    var map = L.map('dotmap', { scrollWheelZoom:false }).setView([39.5,-98.35], 4);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      subdomains:'abcd', maxZoom:19,
+      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    var pts = [];
+    data.forEach(function(d){
+      var icon = L.divIcon({ className:'dot-marker',
+        html:'<span class="pulse"></span><span class="count">'+d.count+'</span>',
+        iconSize:[34,34], iconAnchor:[17,17], popupAnchor:[0,-18] });
+      L.marker([d.lat,d.lng], {icon:icon, title:d.city}).addTo(map)
+        .bindPopup('<b>'+d.city+'</b><br>'+d.count+' Dot &middot; '+d.status);
+      pts.push([d.lat,d.lng]);
+    });
+    if(pts.length === 1){ map.setView(pts[0], 9); }
+    else if(pts.length > 1){ map.fitBounds(pts, {padding:[40,40]}); }
+  });
+</script>
 
 <div class="card">
   <form method="get" action="{% url 'dots_finder' %}" class="cols">

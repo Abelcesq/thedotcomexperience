@@ -71,6 +71,21 @@ input:focus,textarea:focus{outline:2px solid var(--gold-solid);outline-offset:1p
 .dot-result{border:1px solid var(--line);border-radius:14px;padding:1.2rem 1.3rem;margin:.8rem 0;background:rgba(255,255,255,.02)}
 .dot-result h3{font-size:1.1rem;color:#fff;margin-bottom:.3rem}
 .muted{color:var(--muted)}
+/* Find-a-Dot map */
+.map-wrap{height:440px;margin:1rem 0 .4rem;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+#dotmap{height:100%;width:100%;background:#0a1627}
+.leaflet-container{font-family:"Inter",sans-serif}
+.dot-marker{position:relative;width:34px;height:34px}
+.dot-marker .count{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fbf0c9,#d9b85a 60%,#b38728);color:#241803;font-weight:800;font-size:.95rem;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer}
+.dot-marker .pulse{position:absolute;inset:-6px;z-index:1;border-radius:50%;border:2px solid rgba(217,184,90,.6);animation:dotpulse 2.6s ease-out infinite}
+@keyframes dotpulse{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+.leaflet-popup-content-wrapper{background:#0c1f36;color:var(--ink);border:1px solid var(--line);border-radius:12px}
+.leaflet-popup-tip{background:#0c1f36}
+.leaflet-popup-content{margin:12px 14px;font-size:.92rem;line-height:1.5}
+.leaflet-popup-content b{color:#fff}
+.leaflet-popup-content a{color:var(--gold-solid);font-weight:600}
+@media (max-width:640px){.map-wrap{height:340px}}
 footer{padding:2.4rem 0 3rem;text-align:center}
 .foot-url{color:var(--muted);font-size:.82rem}
 .foot-url a{color:var(--muted);text-decoration:none}

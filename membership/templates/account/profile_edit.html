@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Edit profile — The Dot Com Experience{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/css/intlTelInput.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/intlTelInput.min.js"></script>
+<style>
+  .iti{width:100%}
+  .iti__flag{background-image:url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/img/flags.png")}
+  @media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
+    .iti__flag{background-image:url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/img/flags@2x.png")}}
+  .iti__country-list{color:#1a2230;max-width:min(92vw,360px)}
+  .iti--separate-dial-code .iti__selected-dial-code{color:var(--ink)}
+</style>
 <section class="hero" style="text-align:left">
   <span class="eyebrow">Member</span>
   <h1>Edit your <span class="gold">profile</span></h1>
@@ -31,4 +41,27 @@
     </div>
   </form>
 </div>
+
+<script>
+  // International phone input: country picker + auto-format to E.164 on submit.
+  window.addEventListener('DOMContentLoaded', function(){
+    var input = document.getElementById('id_phone');
+    if(!input || typeof window.intlTelInput === 'undefined') return;
+    var iti = window.intlTelInput(input, {
+      initialCountry: "us",
+      separateDialCode: true,
+      preferredCountries: ["us", "ca", "gb", "mx"],
+      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/utils.js"
+    });
+    // If a stored number exists (E.164), load it so the right country is shown.
+    if(input.value){ iti.setNumber(input.value); }
+    var form = input.closest('form');
+    if(form){
+      form.addEventListener('submit', function(){
+        // Replace the field value with full international format before posting.
+        if(input.value.trim()){ input.value = iti.getNumber(); }
+      });
+    }
+  });
+</script>
 {% endblock %}
