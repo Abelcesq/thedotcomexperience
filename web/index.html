@@ -493,9 +493,11 @@
     var el = document.getElementById('dotmap');
     if(!el || typeof L === 'undefined') return;
     var FALLBACK = [{ city:'Sacramento, CA', lat:38.5816, lng:-121.4944, status:'Forming', count:1 }];
-    var map = L.map('dotmap', { scrollWheelZoom:false, worldCopyJump:true }).setView([39.5,-98.35], 4);
+    var WORLD = [[-85,-180],[85,180]];
+    var map = L.map('dotmap', { scrollWheelZoom:false, minZoom:2, maxZoom:16,
+      maxBounds:WORLD, maxBoundsViscosity:1.0 }).setView([39.5,-98.35], 4);
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-      { maxZoom:16, attribution:'Tiles &copy; Esri' }).addTo(map);
+      { minZoom:2, maxZoom:16, noWrap:true, bounds:WORLD, attribution:'Tiles &copy; Esri' }).addTo(map);
     function addDot(d){
       var icon = L.divIcon({ className:'dot-marker',
         html:'<span class="pulse"></span><span class="count">'+(d.count||1)+'</span>',
