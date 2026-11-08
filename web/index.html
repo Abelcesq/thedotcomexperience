@@ -38,6 +38,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   /* Layout: a single deep-space column — sticky quiet nav, an emblem hero that states the
      thesis, then calm stacked bands (ways in -> membership -> philosophy -> capture). */
@@ -187,6 +189,26 @@
     nav.links{gap:14px}
     nav.links a.hide-sm{display:none}
   }
+  /* Find-a-Dot map */
+  .map-wrap{height:460px;margin-top:26px;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  #dotmap{height:100%;width:100%;background:#0a1627}
+  .leaflet-container{font-family:var(--font-body)}
+  .dot-marker{position:relative;width:34px;height:34px}
+  .dot-marker .count{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fbf0c9,#e8c06a 60%,#caa23f);color:#241803;
+    font-family:var(--font-body);font-weight:800;font-size:.95rem;border:2px solid #fff;
+    box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer}
+  .dot-marker .pulse{position:absolute;inset:-6px;z-index:1;border-radius:50%;border:2px solid rgba(232,192,106,.6);
+    animation:dotpulse 2.6s ease-out infinite}
+  @keyframes dotpulse{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+  .leaflet-popup-content-wrapper{background:var(--bg-panel);color:var(--fg);border:1px solid var(--line);border-radius:12px}
+  .leaflet-popup-tip{background:var(--bg-panel)}
+  .leaflet-popup-content{margin:12px 14px;font-size:.92rem;line-height:1.5}
+  .leaflet-popup-content b{font-family:var(--font-display);font-size:1.05rem;color:#fff}
+  .leaflet-popup-content a{color:var(--gold);font-weight:600}
+  @media (max-width:640px){.map-wrap{height:360px}}
 </style>
 </head>
 <body>
@@ -196,7 +218,7 @@
   <div class="wrap">
     <a class="brand" href="#top">The Dot<b>·</b>Com Experience</a>
     <nav class="links">
-      <a class="hide-sm" href="#ways">Find a Dot</a>
+      <a class="hide-sm" href="#find">Find a Dot</a>
       <a class="hide-sm" href="/about">About</a>
       <a class="hide-sm" href="#join">Membership</a>
       <a class="login" href="https://members.thedotx.com/accounts/login/">Log in</a>
@@ -218,7 +240,7 @@
       perspective, contribution, and stewardship. You are on your own journey, and you are not alone.</p>
     <div class="hero-cta">
       <a class="btn btn-gold" href="https://members.thedotx.com/join/">Become a member — $20/month</a>
-      <a class="btn btn-ghost" href="#ways">Find a Dot near you</a>
+      <a class="btn btn-ghost" href="#find">Find a Dot near you</a>
     </div>
     <p class="caption">Weekly, in person, built on trust. Cancel anytime.</p>
   </div>
@@ -262,6 +284,17 @@
         <span class="tag">The heart of the movement</span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- FIND A DOT (map) -->
+<section class="band" id="find">
+  <div class="wrap">
+    <p class="kicker">Find a Dot</p>
+    <h2>Where the Dots are</h2>
+    <p class="intro" style="max-width:62ch">We're just beginning. One Dot is forming in <strong>Sacramento, California</strong> — explore the map below. No Dot near you yet? Request a new location and we&rsquo;ll help bring one to your city.</p>
+    <div class="map-wrap"><div id="dotmap" aria-label="Map of Dot locations"></div></div>
+    <p class="caption" style="margin-top:16px"><strong>1 Dot</strong> &middot; Sacramento, CA (forming). <a href="#capture">No Dot near you? Request a new location &rarr;</a></p>
   </div>
 </section>
 
@@ -382,7 +415,7 @@
     <div class="frow">
       <a class="brand" href="#top" style="font-size:1rem">The Dot<b>·</b>Com Experience</a>
       <div class="flinks">
-        <a href="#ways">Find a Dot</a>
+        <a href="#find">Find a Dot</a>
         <a href="#join">Membership</a>
         <a href="https://www.skool.com/the-dot-comp-experience-1714/about" target="_blank" rel="noopener">Community</a>
         <a href="/about">About</a>
@@ -450,6 +483,32 @@
         if(note) note.textContent = 'Question copied — paste it if your assistant opens blank.'; });
     });
   })();
+
+  // Find-a-Dot interactive map (Leaflet is deferred, so init after the DOM is ready).
+  window.addEventListener('DOMContentLoaded', function(){
+    var el = document.getElementById('dotmap');
+    if(!el || typeof L === 'undefined') return;
+    // Current Dots. Add more here (or the members app reads these from its database).
+    var DOTS = [
+      { city:'Sacramento, CA', lat:38.5816, lng:-121.4944, count:1, status:'Forming' }
+    ];
+    var map = L.map('dotmap', { scrollWheelZoom:false, zoomControl:true, attributionControl:true })
+      .setView([39.5, -98.35], 4); // continental US
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      subdomains:'abcd', maxZoom:19,
+      attribution:'&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    DOTS.forEach(function(d){
+      var icon = L.divIcon({
+        className:'dot-marker',
+        html:'<span class="pulse"></span><span class="count">'+d.count+'</span>',
+        iconSize:[34,34], iconAnchor:[17,17], popupAnchor:[0,-18]
+      });
+      L.marker([d.lat,d.lng], {icon:icon, title:d.city}).addTo(map)
+        .bindPopup('<b>'+d.city+'</b><br>'+d.count+' Dot &middot; '+d.status +
+          '<br><a href="https://members.thedotx.com/join/">Become a member &rarr;</a>');
+    });
+  });
 </script>
 
 </body>
