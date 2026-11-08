@@ -153,6 +153,8 @@
     background:#060f1d;border:1px solid var(--line);border-radius:10px;padding:11px 15px;cursor:pointer;font-size:.98rem}
   .intent input{accent-color:var(--gold);width:16px;height:16px}
   .intent label:has(input:checked){border-color:var(--gold);color:var(--fg)}
+  .apply-note{grid-column:1/-1;margin:10px 0 0;font-size:.9rem;line-height:1.55;color:var(--muted);
+    background:#060f1d;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:12px 14px}
   .cap .submit{grid-column:1 / -1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:4px}
   .privacy{font-size:.8rem;color:var(--muted)}
   .ok{grid-column:1/-1;color:var(--gold);font-weight:700;font-size:1rem}
@@ -283,18 +285,18 @@
         <span class="soon">Opening soon</span>
         <p class="kicker" style="margin-bottom:6px">Membership</p>
         <div class="price">$20<span> / month</span></div>
-        <p style="color:var(--muted);margin:0">One membership. Your local Dot, the weekly reflections, and the global community.</p>
+        <p style="color:var(--muted);margin:0">The online community and the weekly reflections from day one — and a seat in your local Dot the moment one opens near you.</p>
         <ul>
-          <li>A seat in a weekly in-person Dot near you</li>
-          <li>The Creed and the weekly reflection</li>
-          <li>The online community and member connections worldwide</li>
+          <li>The online community and member connections worldwide — from day one</li>
+          <li>The Creed and the weekly reflection, every week</li>
+          <li>A seat in a weekly in-person Dot — as soon as one opens in your city</li>
           <li>Leave anytime — immediate, no pressure</li>
         </ul>
       </div>
       <div class="join-right">
         <a class="btn btn-gold" href="#capture">Join the waitlist →</a>
         <a class="btn btn-ghost" href="https://www.skool.com/the-dot-comp-experience-1714/about" target="_blank" rel="noopener" style="text-align:center">Enter the community on Skool</a>
-        <p class="ppp">Memberships open soon. Add your name below and you&rsquo;ll be invited first. Pricing adjusts by country so it stays within reach everywhere.</p>
+        <p class="ppp">Memberships open soon. Add your name below and you&rsquo;ll be invited first. You get the community and the reflections right away; your local Dot joins when one opens near you. Pricing adjusts by country so it stays within reach everywhere.</p>
       </div>
     </div>
   </div>
@@ -324,9 +326,9 @@
   <div class="wrap">
     <div class="capture">
       <p class="kicker">Stay close</p>
-      <h2>Find your Dot, or start one</h2>
+      <h2>Find your Dot — or bring one to your city</h2>
       <p class="intro">No Dot in your city yet? Add yourself and we&rsquo;ll let you know when one is forming —
-        or raise your hand to start one. We&rsquo;ll also send the reflections.</p>
+        or request a new Dot location and apply to lead it. We&rsquo;ll also send the reflections.</p>
       <form class="cap" id="waitlist" novalidate>
         <div class="field">
           <label for="fn">First name</label>
@@ -344,8 +346,9 @@
           <label>I want to…</label>
           <div class="intent">
             <label><input type="radio" name="intent" value="join" checked> Join a Dot</label>
-            <label><input type="radio" name="intent" value="start"> Start a Dot</label>
+            <label><input type="radio" name="intent" value="request_location"> Request a new Dot location</label>
           </div>
+          <p class="apply-note" id="applyNote" hidden>Every Dot is chartered, not improvised. Like BNI or the Girl Scouts, new locations go through an application and ambassador-training process so each Dot keeps the same format, content, and standards — no rogue or copycat groups. Request your city below and we&rsquo;ll send you the next steps to apply.</p>
         </div>
         <div class="submit">
           <button type="submit" class="btn btn-gold">Keep me posted →</button>
@@ -413,7 +416,15 @@
     var f = document.getElementById('waitlist'); if(!f) return;
     var em = document.getElementById('em'), ok = document.getElementById('ok'), err = document.getElementById('err');
     var btn = f.querySelector('button'), sub = f.querySelector('.submit');
+    var applyNote = document.getElementById('applyNote');
     function fail(m){ err.textContent = m; err.hidden = false; }
+    // Reveal the "how new Dots are chartered" note only when requesting a location.
+    f.querySelectorAll('input[name=intent]').forEach(function(r){
+      r.addEventListener('change', function(){
+        var reqEl = f.querySelector('input[name=intent]:checked');
+        if(applyNote) applyNote.hidden = !(reqEl && reqEl.value === 'request_location');
+      });
+    });
     f.addEventListener('submit', function(e){
       e.preventDefault(); err.hidden = true;
       var email = (em.value||'').trim();
@@ -429,7 +440,9 @@
       };
       fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
         .then(function(r){ return r.json().catch(function(){ return {ok:r.ok}; }); })
-        .then(function(d){ if(d&&d.ok){ sub.hidden=true; f.querySelectorAll('.field').forEach(function(x){x.style.display='none';}); ok.hidden=false; }
+        .then(function(d){ if(d&&d.ok){
+            if(payload.intent === 'request_location'){ ok.textContent = 'Thank you — your request is in. Chartering a new Dot is an application and training process, and we’ll email you the next steps to apply as an ambassador. Experience the Experience.'; }
+            sub.hidden=true; f.querySelectorAll('.field').forEach(function(x){x.style.display='none';}); ok.hidden=false; }
           else { fail((d&&d.error)||'Something went wrong. Please try again.'); btn.disabled=false; } })
         .catch(function(){ fail('Network error. Please try again.'); btn.disabled=false; });
     });
