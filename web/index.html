@@ -7,6 +7,11 @@
 <meta name="description" content="A movement for conscious living. Small local circles — Dots — that meet in person every week to live with perspective, contribution, and stewardship. Discover the philosophy, find the community, join a Dot near you.">
 <meta name="author" content="Abel Calderon, Jr.">
 <meta name="theme-color" content="#050c16">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="canonical" href="https://www.thedotx.com/">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
@@ -86,12 +91,11 @@
   nav.links .btn-gold{padding:9px 18px}
 
   .hero{text-align:center;padding-block:72px 40px}
-  .emblem{width:170px;height:170px;margin:0 auto 30px;display:block}
-  @media (prefers-reduced-motion:no-preference){
-    .emblem .spin{transform-origin:100px 100px;animation:rot 46s linear infinite}
-    .emblem .spin-rev{transform-origin:100px 100px;animation:rot 70s linear infinite reverse}
-  }
-  @keyframes rot{to{transform:rotate(360deg)}}
+  .cosmic{width:min(74vw,320px);aspect-ratio:1;margin:0 auto 32px;display:block;border-radius:50%;
+    object-fit:cover;background:#050c16;
+    -webkit-mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 88%);
+    mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 88%);
+    filter:drop-shadow(0 0 54px rgba(139,127,214,.28)) drop-shadow(0 0 22px rgba(232,192,106,.18))}
   .eyebrow{font-size:.78rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 18px}
   h1.title{font-family:var(--font-display);font-weight:500;font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.02;margin:0 0 20px;text-wrap:balance;letter-spacing:.01em}
   .lede{max-width:44ch;margin:0 auto 30px;color:var(--muted);font-size:1.1rem}
@@ -204,26 +208,10 @@
 <!-- HERO -->
 <section class="hero" id="top">
   <div class="wrap">
-    <svg class="emblem" viewBox="0 0 200 200" fill="none" aria-label="The Dot Com Experience emblem">
-      <circle cx="100" cy="100" r="78" stroke="var(--gold)" stroke-width="1" opacity=".55"/>
-      <circle cx="100" cy="100" r="62" stroke="var(--violet)" stroke-width="1" opacity=".4"/>
-      <g class="spin" opacity=".9">
-        <g stroke="var(--gold)" stroke-width="1" opacity=".5">
-          <line x1="100" y1="30" x2="100" y2="54"/><line x1="100" y1="146" x2="100" y2="170"/>
-          <line x1="30" y1="100" x2="54" y2="100"/><line x1="146" y1="100" x2="170" y2="100"/>
-          <line x1="50" y1="50" x2="67" y2="67"/><line x1="133" y1="133" x2="150" y2="150"/>
-          <line x1="150" y1="50" x2="133" y2="67"/><line x1="67" y1="133" x2="50" y2="150"/>
-        </g>
-      </g>
-      <g class="spin-rev">
-        <circle cx="100" cy="42" r="3.4" fill="var(--gold)"/><circle cx="158" cy="100" r="3.4" fill="var(--violet)"/>
-        <circle cx="100" cy="158" r="3.4" fill="var(--gold)"/><circle cx="42" cy="100" r="3.4" fill="var(--violet)"/>
-        <circle cx="141" cy="59" r="2.6" fill="var(--gold)" opacity=".8"/><circle cx="141" cy="141" r="2.6" fill="var(--violet)" opacity=".8"/>
-        <circle cx="59" cy="141" r="2.6" fill="var(--gold)" opacity=".8"/><circle cx="59" cy="59" r="2.6" fill="var(--violet)" opacity=".8"/>
-      </g>
-      <circle cx="100" cy="100" r="13" fill="var(--gold)" opacity=".16"/>
-      <circle cx="100" cy="100" r="5" fill="var(--gold)"/>
-    </svg>
+    <video class="cosmic" autoplay muted loop playsinline poster="assets/hero-poster.jpg"
+      aria-label="The Dot Com Experience cosmic emblem">
+      <source src="assets/dotx-cosmic-logo.mp4" type="video/mp4">
+    </video>
     <p class="eyebrow">A movement for conscious living</p>
     <h1 class="title">Experience the Experience</h1>
     <p class="lede">Small local circles — called Dots — that meet in person every week to live with
@@ -398,6 +386,7 @@
         <a href="#join">Membership</a>
         <a href="https://www.skool.com/the-dot-comp-experience-1714/about" target="_blank" rel="noopener">Community</a>
         <a href="/about">About</a>
+        <a href="/terms">Terms</a>
         <a href="https://abelcalderon.com/" target="_blank" rel="noopener">Founder</a>
       </div>
     </div>
