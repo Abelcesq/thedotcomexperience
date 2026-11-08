@@ -112,6 +112,42 @@ async function sendWelcomeEmail(email, name, source) {
   }
 }
 
+// Notify the admin (you) of every new opt-in, via Resend. Best-effort.
+// Sends to ADMIN_NOTIFY_EMAIL (default info@thedotcomexperience.com). Reply-To is the
+// subscriber, so you can reply to them directly from the notification.
+async function notifyAdmin(email, name, source, city, intent) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  const to = process.env.ADMIN_NOTIFY_EMAIL || 'info@thedotcomexperience.com';
+  const from = process.env.ADMIN_NOTIFY_FROM || process.env.WELCOME_FROM
+    || 'The Dot Com Experience <info@thedotcomexperience.com>';
+  const rows = [
+    ['Email', email], ['Name', name || '—'], ['City', city || '—'],
+    ['Intent', intent || '—'], ['Source', source || '—'], ['Time (UTC)', new Date().toISOString()],
+  ];
+  const html =
+    '<div style="font-family:Arial,sans-serif;color:#1a2230">' +
+    '<h2 style="margin:0 0 12px">New signup — The Dot Com Experience</h2>' +
+    '<table style="border-collapse:collapse;font-size:15px">' +
+    rows.map(([k, v]) =>
+      `<tr><td style="padding:6px 14px 6px 0;color:#6b7686">${k}</td>` +
+      `<td style="padding:6px 0;font-weight:600">${escapeHtml(v)}</td></tr>`).join('') +
+    '</table></div>';
+  const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
+  const subject = `New signup: ${email}` + (city ? ' · ' + city : '');
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, reply_to: email, subject, html, text }),
+    });
+    if (!r.ok) console.error('[notify] resend returned', r.status, await r.text().catch(() => ''));
+    else console.log('[notify] admin notified of', email);
+  } catch (e) {
+    console.error('[notify] error:', e.message);
+  }
+}
+
 // Push a subscriber into Flodesk via its API. Best-effort; logs the outcome.
 async function addToFlodesk(email, name) {
   const key = process.env.FLODESK_API_KEY;
@@ -205,6 +241,7 @@ app.post('/api/subscribe', async (req, res) => {
     addToFlodesk(email, name),
     postWebhook(email, name),
     sendWelcomeEmail(email, name, source),
+    notifyAdmin(email, name, source, city, intent),
   ]);
 
   // Always acknowledge the visitor; the email is logged even if a provider hiccups.
