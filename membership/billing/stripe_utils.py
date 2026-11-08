@@ -50,6 +50,12 @@ def create_portal_session(profile, return_url):
     return s.billing_portal.Session.create(customer=customer_id, return_url=return_url)
 
 
+def retrieve_subscription(subscription_id):
+    """Fetch a subscription (for the renewal date right after checkout)."""
+    s = _client()
+    return s.Subscription.retrieve(subscription_id)
+
+
 def construct_event(payload, sig_header):
     """Verify + parse a webhook. Raises on bad signature."""
     return stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)

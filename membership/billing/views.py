@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.models import Profile
 from . import stripe_utils
+from .models import WebhookEvent
 
 
 def join(request):
@@ -89,7 +90,12 @@ def webhook(request):
         return HttpResponseBadRequest("invalid signature")
 
     etype = event["type"]
+    event_id = event.get("id") or ""
     obj = event["data"]["object"]
+
+    # Dedup: Stripe can deliver the same event more than once. Skip if already seen.
+    if event_id and WebhookEvent.objects.filter(stripe_event_id=event_id).exists():
+        return HttpResponse(status=200)
 
     if etype == "checkout.session.completed":
         profile = _profile_for(
@@ -98,8 +104,22 @@ def webhook(request):
         )
         if profile:
             profile.stripe_customer_id = obj.get("customer") or profile.stripe_customer_id
-            profile.stripe_subscription_id = obj.get("subscription") or profile.stripe_subscription_id
+            sub_id = obj.get("subscription")
+            if sub_id:
+                profile.stripe_subscription_id = sub_id
             profile.membership_status = Profile.MembershipStatus.ACTIVE
+            # Fetch the subscription so the renewal date + price show immediately on the
+            # profile (otherwise they populate a moment later via subscription.updated).
+            if sub_id and stripe_utils.configured():
+                try:
+                    sub = stripe_utils.retrieve_subscription(sub_id)
+                    profile.current_period_end = _ts_to_dt(sub.get("current_period_end"))
+                    items = (sub.get("items") or {}).get("data") or []
+                    if items:
+                        profile.price_id = (items[0].get("price") or {}).get("id", profile.price_id)
+                except Exception:  # noqa: BLE001 — non-fatal; subscription.updated will fill these
+                    import logging
+                    logging.getLogger("billing").warning("could not fetch subscription %s", sub_id)
             profile.save()
 
     elif etype in ("customer.subscription.updated", "customer.subscription.created"):
@@ -135,5 +155,14 @@ def webhook(request):
         if profile:
             profile.membership_status = Profile.MembershipStatus.PAST_DUE
             profile.save()
+
+    # Record the event (dedup + audit). Best-effort; never fail the webhook over the log.
+    if event_id:
+        try:
+            WebhookEvent.objects.get_or_create(
+                stripe_event_id=event_id, defaults={"type": etype}
+            )
+        except Exception:  # noqa: BLE001
+            pass
 
     return HttpResponse(status=200)
