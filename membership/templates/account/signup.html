@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Join — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero">
+  <span class="eyebrow">Membership</span>
+  <h1>Create your <span class="gold">account</span></h1>
+  <p>Join the movement for conscious living. Membership is {{ MEMBERSHIP_PRICE_LABEL }} — you'll set up payment next.</p>
+</section>
+<div class="card" style="max-width:480px;margin-inline:auto">
+  <form method="post" action="{% url 'account_signup' %}" class="cols" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="errorlist">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form.visible_fields %}
+      {% if field.name == 'coc_agreed' %}
+        <div class="formrow">
+          <label class="checkbox">{{ field }} <span>{{ field.label|safe }}</span></label>
+          {{ field.errors }}
+        </div>
+      {% else %}
+        <div class="field formrow">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endif %}
+    {% endfor %}
+    {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
+    <div class="submit"><button class="btn" type="submit">Create account</button></div>
+  </form>
+  <p class="help" style="margin-top:1rem">Already a member? <a href="{% url 'account_login' %}">Log in →</a></p>
+</div>
+{% endblock %}

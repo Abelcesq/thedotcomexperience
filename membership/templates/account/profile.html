@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}My profile — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero" style="text-align:left">
+  <span class="eyebrow">Member</span>
+  <h1>Your <span class="gold">profile</span></h1>
+</section>
+
+{% if stripe_pending %}
+  <div class="callout">Payment complete — your plan is being activated. This page will reflect the change within a few seconds.</div>
+{% endif %}
+
+<!-- Account -->
+<div class="card">
+  <h3>Account</h3>
+  <div class="row"><span class="k">Name</span><span class="v">{{ profile.display_name|default:request.user.get_full_name|default:"—" }}</span></div>
+  <div class="row"><span class="k">Email</span><span class="v">{{ request.user.email }}</span></div>
+  <div class="row"><span class="k">Member since</span><span class="v">{{ request.user.date_joined|date:"M j, Y" }}</span></div>
+  <div class="submit">
+    <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>
+    <a class="btn btn-ghost btn-sm" href="{% url 'account_change_password' %}">Change password</a>
+  </div>
+</div>
+
+<!-- Membership / Subscription -->
+<div class="card">
+  <h3>Membership</h3>
+  <div class="price">{{ MEMBERSHIP_PRICE_LABEL }}</div>
+  <div class="row"><span class="k">Status</span><span class="v"><span class="pill {{ profile.membership_status }}">{{ profile.get_membership_status_display }}</span></span></div>
+  {% if profile.current_period_end %}
+    <div class="row"><span class="k">{% if profile.membership_status == 'canceled' %}Access until{% else %}Renews{% endif %}</span><span class="v">{{ profile.current_period_end|date:"M j, Y" }}</span></div>
+  {% endif %}
+  <div class="submit">
+    {% if profile.is_active_member or profile.membership_status == 'past_due' %}
+      <form method="post" action="{% url 'customer_portal' %}" class="inline-form">{% csrf_token %}
+        <button class="btn btn-sm" type="submit">Manage billing</button>
+      </form>
+      <span class="help">Update your card, view invoices, or cancel.</span>
+    {% else %}
+      <a class="btn btn-sm" href="{% url 'join' %}">Become a member — {{ MEMBERSHIP_PRICE_LABEL }}</a>
+    {% endif %}
+  </div>
+  {% if not STRIPE_CONFIGURED %}<p class="help" style="margin-top:.6rem">Payments open soon.</p>{% endif %}
+</div>
+
+<!-- My Dot -->
+<div class="card">
+  <h3>My Dot</h3>
+  {% if dot_membership %}
+    <p><strong>{{ dot_membership.dot.name }}</strong> — {{ dot_membership.dot.city }}</p>
+    <p class="muted">Meets {{ dot_membership.dot.meeting_night }} {{ dot_membership.dot.meeting_time }}{% if dot_membership.dot.location %} · {{ dot_membership.dot.location }}{% endif %}</p>
+  {% else %}
+    <p class="muted">You're not in a Dot yet. Find one near you, or request a new location in your city.</p>
+    <div class="submit">
+      <a class="btn btn-ghost btn-sm" href="{% url 'dots_finder' %}">Find a Dot</a>
+      <a class="btn btn-ghost btn-sm" href="{% url 'request_dot' %}">Request a new Dot location</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Help -->
+<div class="card">
+  <h3>Help &amp; support</h3>
+  <p class="muted">Questions about your membership or a Dot? Email <a href="mailto:info@thedotcomexperience.com">info@thedotcomexperience.com</a>.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Become a member — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero">
+  <span class="eyebrow">Membership</span>
+  <h1>Become a <span class="gold">member</span></h1>
+  <p>One membership. The online community and the weekly reflections from day one — and a seat in your local Dot the moment one opens near you.</p>
+</section>
+
+<div class="card">
+  <div class="price">{{ MEMBERSHIP_PRICE_LABEL }}</div>
+  <div class="row"><span class="k">Community &amp; member connections worldwide</span><span class="v">From day one</span></div>
+  <div class="row"><span class="k">The Creed &amp; the weekly reflection</span><span class="v">Every week</span></div>
+  <div class="row"><span class="k">A seat in a weekly in-person Dot</span><span class="v">When one opens near you</span></div>
+  <div class="row"><span class="k">Cancel anytime</span><span class="v">No pressure</span></div>
+
+  <div class="submit">
+    {% if STRIPE_CONFIGURED %}
+      <form method="post" action="{% url 'checkout' %}" class="inline-form">{% csrf_token %}
+        <button class="btn" type="submit">Continue to secure checkout →</button>
+      </form>
+    {% else %}
+      <a class="btn" href="/dots/">Join the waitlist →</a>
+      <span class="help">Payments open soon — add your name and you'll be invited first.</span>
+    {% endif %}
+  </div>
+  <p class="help" style="margin-top:.8rem">Secure payment is handled by Stripe. By joining you agree to our
+    <a href="/terms/">Terms</a> and <a href="/terms/#conduct">Code of Conduct</a>; membership fees are forfeited if you are removed for a violation.</p>
+</div>
+
+<div class="callout">
+  <strong>No Dot in your area yet?</strong> You still get real value from day one — the community and the weekly
+  reflections — and you join a local Dot as soon as one forms near you. You're never charged for a circle that doesn't exist.
+</div>
+{% endblock %}

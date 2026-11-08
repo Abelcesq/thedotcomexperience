@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Application received — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero">
+  <span class="eyebrow">Thank you</span>
+  <h1>Your request is <span class="gold">in</span></h1>
+  <p>Chartering a new Dot is an application and training process. We'll review your request for {{ application.city }}
+     and email you the next steps to apply as an ambassador. Experience the Experience.</p>
+  <div class="submit" style="justify-content:center;margin-top:1.4rem">
+    <a class="btn btn-ghost" href="/dots/">Back to Find a Dot</a>
+  </div>
+</section>
+{% endblock %}

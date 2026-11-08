@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}The Dot Com Experience — members{% endblock %}
+{% block content %}
+<section class="hero">
+  <span class="eyebrow">A movement for conscious living</span>
+  <h1>Experience the <span class="gold">Experience</span></h1>
+  <p>Small local circles — called Dots — that meet in person every week. This is the members' home.</p>
+  <div class="submit" style="justify-content:center;margin-top:1.4rem">
+    {% if request.user.is_authenticated %}
+      <a class="btn" href="{% url 'profile' %}">Go to my profile</a>
+    {% else %}
+      <a class="btn" href="{% url 'account_signup' %}">Become a member — {{ MEMBERSHIP_PRICE_LABEL }}</a>
+      <a class="btn btn-ghost" href="{% url 'dots_finder' %}">Find a Dot</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

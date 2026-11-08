@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="The Dot Com Experience">
+  <rect width="64" height="64" rx="13" fill="#05080f"/>
+  <g transform="translate(32 32)">
+    <!-- outer ring -->
+    <circle r="26" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <!-- orbiting points (8-fold radial symmetry, echoing the mandala) -->
+    <g fill="#ffffff">
+      <circle cx="0" cy="-18" r="2.1"/>
+      <circle cx="12.7" cy="-12.7" r="2.1"/>
+      <circle cx="18" cy="0" r="2.1"/>
+      <circle cx="12.7" cy="12.7" r="2.1"/>
+      <circle cx="0" cy="18" r="2.1"/>
+      <circle cx="-12.7" cy="12.7" r="2.1"/>
+      <circle cx="-18" cy="0" r="2.1"/>
+      <circle cx="-12.7" cy="-12.7" r="2.1"/>
+    </g>
+    <!-- the Dot -->
+    <circle r="7.5" fill="#ffffff"/>
+  </g>
+</svg>

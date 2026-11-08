@@ -1,0 +1,9 @@
+# The Dot Com Experience — membership platform (Django)
+Django>=5.1,<5.2
+django-allauth>=65,<66
+stripe>=12,<13
+dj-database-url>=2.2
+gunicorn>=23
+whitenoise>=6.7
+python-dotenv>=1.0
+psycopg[binary]>=3.2      # PostgreSQL driver (Heroku); dev uses SQLite
