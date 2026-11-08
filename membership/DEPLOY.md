@@ -35,12 +35,15 @@ heroku addons:create heroku-postgresql:essential-0 -a thedotx-members
 heroku config:set -a thedotx-members \
   DJANGO_SECRET_KEY="$(python -c 'import secrets;print(secrets.token_urlsafe(50))')" \
   DJANGO_DEBUG=false \
-  DJANGO_ALLOWED_HOSTS=".herokuapp.com" \
-  SITE_URL="https://thedotx-members.herokuapp.com" \
+  DJANGO_ALLOWED_HOSTS="members.thedotx.com,.herokuapp.com" \
+  SITE_URL="https://members.thedotx.com" \
   MEMBERSHIP_PRICE_LABEL='$20 / month'
 ```
 
-(Use your real app URL for `SITE_URL`.)
+The live site's "Log in" and "Become a member" buttons point to
+`https://members.thedotx.com`, so set that as `SITE_URL`. Until the subdomain
+is live (step 3b), you can test at the `*.herokuapp.com` URL — the app already
+trusts both.
 
 ## 3. Deploy
 
@@ -65,6 +68,22 @@ heroku run python manage.py createsuperuser -a thedotx-members
 
 Open it: `heroku open -a thedotx-members` → you should see the members home,
 `/accounts/signup/`, `/dots/`, and `/admin/`.
+
+## 3b. Point members.thedotx.com at the app (the subdomain the site links to)
+
+```bash
+heroku domains:add members.thedotx.com -a thedotx-members
+# Heroku prints a DNS target like xxxx.herokudns.com — copy it.
+```
+
+Then in **GoDaddy DNS** (same place you set up thedotx.com), add a **CNAME**:
+- Type: `CNAME` · Host/Name: `members` · Value: the `xxxx.herokudns.com` target
+  Heroku gave you · TTL: default.
+
+Heroku issues HTTPS automatically (ACM). Give DNS a few minutes, then
+`https://members.thedotx.com` should load the app. Until it resolves, the live
+site's Log in / Become a member buttons won't open — so do this before (or right
+after) you deploy the updated Node site.
 
 ## 4. Wire Stripe (test mode)
 

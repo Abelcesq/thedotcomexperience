@@ -23,13 +23,14 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", False)
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.herokuapp.com"
+    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.herokuapp.com,members.thedotx.com"
 ).split(",") if h.strip()]
 
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
     "https://www.thedotx.com,https://thedotx.com,"
     "https://www.thedotcomexperience.com,https://thedotcomexperience.com,"
+    "https://members.thedotx.com,"
     "https://*.herokuapp.com",  # lets a test Heroku deploy's admin/forms work out of the box
 ).split(",") if o.strip()]
 
