@@ -68,6 +68,14 @@ def _ts_to_dt(ts):
     return datetime.fromtimestamp(ts, tz=dt_timezone.utc) if ts else None
 
 
+def _period_end(sub):
+    """Renewal date. In recent API versions (2025+) current_period_end moved from
+    the subscription to its items, so read the item level first, then fall back."""
+    items = (sub.get("items") or {}).get("data") or []
+    pe = (items[0].get("current_period_end") if items else None) or sub.get("current_period_end")
+    return _ts_to_dt(pe)
+
+
 def _profile_for(customer_id=None, user_id=None):
     if user_id:
         p = Profile.objects.filter(user_id=user_id).first()
@@ -113,7 +121,7 @@ def webhook(request):
             if sub_id and stripe_utils.configured():
                 try:
                     sub = stripe_utils.retrieve_subscription(sub_id)
-                    profile.current_period_end = _ts_to_dt(sub.get("current_period_end"))
+                    profile.current_period_end = _period_end(sub)
                     items = (sub.get("items") or {}).get("data") or []
                     if items:
                         profile.price_id = (items[0].get("price") or {}).get("id", profile.price_id)
@@ -137,7 +145,7 @@ def webhook(request):
             }
             profile.membership_status = status_map.get(obj.get("status"), profile.membership_status)
             profile.stripe_subscription_id = obj.get("id") or profile.stripe_subscription_id
-            profile.current_period_end = _ts_to_dt(obj.get("current_period_end"))
+            profile.current_period_end = _period_end(obj)
             items = (obj.get("items") or {}).get("data") or []
             if items:
                 profile.price_id = (items[0].get("price") or {}).get("id", profile.price_id)
@@ -147,7 +155,7 @@ def webhook(request):
         profile = _profile_for(customer_id=obj.get("customer"))
         if profile:
             profile.membership_status = Profile.MembershipStatus.CANCELED
-            profile.current_period_end = _ts_to_dt(obj.get("current_period_end"))
+            profile.current_period_end = _period_end(obj)
             profile.save()
 
     elif etype == "invoice.payment_failed":
