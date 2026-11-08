@@ -28,7 +28,7 @@ local-circle finder, the **Request a new Dot location** application, and
 - **Dots finder** (`/dots/`): search by city; if none, join the waitlist or
   request a new location.
 - **Request a new Dot location** (`/dots/request/`): a vetted **application**
-  (BNI / Girl Scouts model) — reviewed and promoted to Ambassador by an admin.
+  (a vetted application) — reviewed and promoted to Ambassador by an admin.
 - **Admin** (`/admin/`): manage Dots, applications, waitlist, and members;
   one-click **promote to Ambassador**.
 

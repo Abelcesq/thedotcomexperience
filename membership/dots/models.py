@@ -77,7 +77,7 @@ class Waitlist(models.Model):
 
 
 class DotApplication(models.Model):
-    """An application to charter and lead a new Dot (the BNI / Girl Scouts-style vetting)."""
+    """An application to charter and lead a new Dot (vetted, to keep every Dot consistent)."""
 
     class Status(models.TextChoices):
         SUBMITTED = "submitted", "Submitted"
