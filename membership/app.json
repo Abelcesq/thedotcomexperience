@@ -1,0 +1,38 @@
+{
+  "name": "The Dot Com Experience — Membership",
+  "description": "Member auth, $20/mo Stripe subscription, profiles, and the Dots finder (Django).",
+  "repository": "https://github.com/Abelcesq/thedotcomexperience",
+  "keywords": ["django", "stripe", "membership"],
+  "stack": "heroku-24",
+  "buildpacks": [
+    { "url": "https://github.com/lstoll/heroku-buildpack-monorepo" },
+    { "url": "heroku/python" }
+  ],
+  "env": {
+    "APP_BASE": {
+      "description": "Subdirectory that holds the Django app (monorepo buildpack).",
+      "value": "membership"
+    },
+    "DJANGO_SECRET_KEY": {
+      "description": "Long random string. Generate one; never reuse the dev value.",
+      "generator": "secret"
+    },
+    "DJANGO_DEBUG": { "value": "false" },
+    "DJANGO_ALLOWED_HOSTS": { "value": ".herokuapp.com" },
+    "SITE_URL": {
+      "description": "Public base URL of THIS app, e.g. https://thedotx-members.herokuapp.com",
+      "required": true
+    },
+    "STRIPE_PUBLISHABLE_KEY": { "required": false },
+    "STRIPE_SECRET_KEY": { "required": false },
+    "STRIPE_PRICE_ID": { "required": false },
+    "STRIPE_WEBHOOK_SECRET": { "required": false },
+    "MEMBERSHIP_PRICE_LABEL": { "value": "$20 / month" }
+  },
+  "addons": [
+    { "plan": "heroku-postgresql:essential-0" }
+  ],
+  "scripts": {
+    "postdeploy": "python manage.py migrate --noinput"
+  }
+}
