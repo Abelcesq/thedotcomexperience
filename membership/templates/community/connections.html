@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Connections — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero" style="text-align:left">
+  <span class="eyebrow">The community</span>
+  <h1>Your <span class="gold">connections</span></h1>
+</section>
+{% include "community/_subnav.html" with active="connections" %}
+
+{% if incoming %}
+<div class="card">
+  <h3>Requests to connect</h3>
+  {% for c in incoming %}{% with p=c.requester.profile %}
+    <div class="person-row">
+      {% include "community/_avatar.html" with p=p %}
+      <div class="who"><a href="{% url 'member_profile' p.member_id %}">{{ p.name }}</a>{% include "community/_seal.html" with p=p %}
+        <div class="sub">{% include "community/_tier.html" with p=p %}{% if p.city %} &nbsp;{{ p.city }}{% endif %}</div></div>
+      <div class="acts">
+        <form method="post" action="{% url 'member_accept' p.member_id %}">{% csrf_token %}<button class="btn btn-sm" type="submit">Accept</button></form>
+        <form method="post" action="{% url 'member_decline' p.member_id %}">{% csrf_token %}<button class="btn btn-ghost btn-sm" type="submit">Decline</button></form>
+      </div>
+    </div>
+  {% endwith %}{% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Connected</h3>
+  {% for p in accepted %}
+    <div class="person-row">
+      {% include "community/_avatar.html" with p=p %}
+      <div class="who"><a href="{% url 'member_profile' p.member_id %}">{{ p.name }}</a>{% include "community/_seal.html" with p=p %}
+        <div class="sub">{% include "community/_tier.html" with p=p %}{% if p.city %} &nbsp;{{ p.city }}{% endif %}</div></div>
+      <div class="acts"><a class="btn btn-ghost btn-sm" href="{% url 'member_thread' p.member_id %}">Message</a></div>
+    </div>
+  {% empty %}
+    <p class="muted">No connections yet. <a href="{% url 'member_directory' %}">Browse members</a> and send a request.</p>
+  {% endfor %}
+</div>
+
+{% if outgoing %}
+<div class="card">
+  <h3>Requests you sent</h3>
+  {% for c in outgoing %}{% with p=c.addressee.profile %}
+    <div class="person-row">
+      {% include "community/_avatar.html" with p=p %}
+      <div class="who"><a href="{% url 'member_profile' p.member_id %}">{{ p.name }}</a>
+        <div class="sub">Waiting for a reply</div></div>
+      <div class="acts">
+        <form method="post" action="{% url 'member_disconnect' p.member_id %}">{% csrf_token %}<button class="btn btn-ghost btn-sm" type="submit">Cancel</button></form>
+      </div>
+    </div>
+  {% endwith %}{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

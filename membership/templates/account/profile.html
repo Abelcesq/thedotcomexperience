@@ -1,10 +1,28 @@
 {% extends "base.html" %}
 {% block title %}My profile — The Dot Com Experience{% endblock %}
 {% block content %}
-<section class="hero" style="text-align:left">
-  <span class="eyebrow">Member</span>
-  <h1>Your <span class="gold">profile</span></h1>
-</section>
+<div class="pf">
+  {% include "community/_avatar.html" with p=profile size="lg" %}
+  <div class="pf-body">
+    <h1 class="pf-name">{{ profile.name }}{% include "community/_seal.html" with p=profile %}</h1>
+    <div class="pf-meta">
+      {% include "community/_tier.html" with p=profile %}
+      <span class="pf-id">Member ID {{ profile.member_id }}</span>
+      {% if profile.city %}<span>· {{ profile.city }}</span>{% endif %}
+    </div>
+    {% if profile.bio %}<p class="pf-bio">{{ profile.bio }}</p>{% endif %}
+    <div class="pf-actions">
+      <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>
+      {% if profile.can_use_community %}
+        <a class="btn btn-ghost btn-sm" href="{% url 'member_directory' %}">Members</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'connections' %}">Connections{% if pending_requests %}<span class="count">{{ pending_requests }}</span>{% endif %}</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'member_inbox' %}">Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+        {% if profile.is_charter_holder %}<a class="btn btn-ghost btn-sm" href="{% url 'my_team' %}">My team</a>{% endif %}
+      {% endif %}
+    </div>
+    {% if not profile.can_use_community %}<p class="help">The member directory and messages open once your membership is active.</p>{% endif %}
+  </div>
+</div>
 
 {% if stripe_pending %}
   <div class="callout">Payment complete — your plan is being activated. This page will reflect the change within a few seconds.</div>
@@ -15,6 +33,9 @@
   <h3>Account</h3>
   <div class="row"><span class="k">Name</span><span class="v">{{ profile.display_name|default:request.user.get_full_name|default:"—" }}</span></div>
   <div class="row"><span class="k">Email</span><span class="v">{{ request.user.email }}</span></div>
+  <div class="row"><span class="k">Member ID</span><span class="v">{{ profile.member_id }}</span></div>
+  <div class="row"><span class="k">Tier</span><span class="v">{{ profile.get_role_display }}</span></div>
+  {% if profile.reports_to %}<div class="row"><span class="k">Your {{ profile.expected_upline_label }}</span><span class="v"><a href="{% url 'member_profile' profile.reports_to.member_id %}">{{ profile.reports_to.name }}</a></span></div>{% endif %}
   <div class="row"><span class="k">Member since</span><span class="v">{{ request.user.date_joined|date:"M j, Y" }}</span></div>
   <div class="submit">
     <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>

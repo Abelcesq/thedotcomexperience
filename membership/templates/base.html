@@ -22,6 +22,10 @@
       <a class="hide-sm" href="https://www.thedotx.com/about">About</a>
       <a class="hide-sm" href="{% url 'join' %}">Membership</a>
       {% if request.user.is_authenticated %}
+        {% if my_profile.can_use_community %}
+          <a href="{% url 'member_directory' %}">Members</a>
+          <a href="{% url 'member_inbox' %}">Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+        {% endif %}
         <a class="login" href="{% url 'profile' %}">My profile</a>
         <form method="post" action="{% url 'account_logout' %}" class="logout-form">{% csrf_token %}<button class="linklike" type="submit">Log out</button></form>
       {% else %}

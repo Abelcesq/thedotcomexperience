@@ -1,0 +1,7 @@
+<tr class="leader">
+  <td><a href="{% url 'admin:accounts_profile_change' l.profile.pk %}">{{ l.profile.name }}</a></td>
+  <td>{{ l.profile.member_id }}</td><td>Local Leader</td><td>—</td>
+  <td {% if l.stats.over_cap %}class="over"{% endif %}>{{ l.stats.ambassadors }} / {{ l.stats.cap }}</td>
+  <td>{{ l.stats.members }}</td><td>{{ l.stats.active_members }}</td>
+</tr>
+{% for a in l.children %}{% include "admin/accounts/_org_ambassador.html" with a=a %}{% endfor %}

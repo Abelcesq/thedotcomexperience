@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My team — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero" style="text-align:left">
+  <span class="eyebrow">{{ me.get_role_display }}</span>
+  <h1>Your <span class="gold">team</span></h1>
+  <p style="margin-left:0">The people who report directly to you, and the size of the organization beneath them.</p>
+</section>
+{% include "community/_subnav.html" with active="team" %}
+
+<div class="tiles">
+  {% if me.role == 'regional' %}<div class="tile"><b>{{ stats.local_leaders }}{% if stats.cap %}<small class="muted" style="font-size:1rem"> / {{ stats.cap }}</small>{% endif %}</b><span>Local Leaders</span></div>{% endif %}
+  {% if me.role != 'ambassador' %}<div class="tile"><b>{{ stats.ambassadors }}{% if me.role == 'local_leader' and stats.cap %}<small class="muted" style="font-size:1rem"> / {{ stats.cap }}</small>{% endif %}</b><span>Ambassadors</span></div>{% endif %}
+  <div class="tile"><b>{{ stats.members }}{% if me.role == 'ambassador' and stats.cap %}<small class="muted" style="font-size:1rem"> / {{ stats.cap }}</small>{% endif %}</b><span>Members</span></div>
+  <div class="tile"><b>{{ stats.active_members }}</b><span>Active members</span></div>
+</div>
+{% if stats.over_cap %}<div class="callout">Your group is over its size limit of {{ stats.cap }}. Talk with your upline about opening a new group.</div>{% endif %}
+
+<div class="card">
+  <h3>Reporting to you</h3>
+  {% for row in people %}{% with p=row.profile %}
+    <div class="person-row">
+      {% include "community/_avatar.html" with p=p %}
+      <div class="who">
+        <a href="{% url 'member_profile' p.member_id %}">{{ p.name }}</a>{% include "community/_seal.html" with p=p %}
+        <div class="sub">{% include "community/_tier.html" with p=p %} &nbsp;{{ p.member_id }}{% if p.city %} · {{ p.city }}{% endif %}
+          {% if row.stats %} · {% if p.role == 'local_leader' %}{{ row.stats.ambassadors }} ambassador{{ row.stats.ambassadors|pluralize }}, {% endif %}{{ row.stats.members }} member{{ row.stats.members|pluralize }} ({{ row.stats.active_members }} active){% endif %}</div>
+      </div>
+      <div class="acts" style="align-items:center">
+        <span class="pill {{ p.membership_status }}">{{ p.get_membership_status_display }}</span>
+        <a class="btn btn-ghost btn-sm" href="{% url 'member_thread' p.member_id %}">Message</a>
+      </div>
+    </div>
+  {% endwith %}{% empty %}
+    <p class="muted">No one has been assigned to you yet. The team at The Dot Com Experience places members with their Ambassador.</p>
+  {% endfor %}
+</div>
+<p class="help">Membership dues are always paid directly to The Dot Com Experience through this site. Charter holders never collect, request, or receive dues.</p>
+{% endblock %}

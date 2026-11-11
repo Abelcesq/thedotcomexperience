@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Members — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero" style="text-align:left">
+  <span class="eyebrow">The community</span>
+  <h1>Find your <span class="gold">people</span></h1>
+  <p style="margin-left:0">Search members by name, city, or Member ID. Connect to start a conversation.</p>
+</section>
+{% include "community/_subnav.html" with active="directory" %}
+
+<form method="get" class="searchbar">
+  <input type="text" name="q" value="{{ q }}" placeholder="Name, city, or Member ID (DX-000000)" aria-label="Search members">
+  {% if tier %}<input type="hidden" name="tier" value="{{ tier }}">{% endif %}
+  <button class="btn btn-sm" type="submit">Search</button>
+</form>
+<div class="chips">
+  <a href="?q={{ q|urlencode }}"{% if not tier %} class="on"{% endif %}>Everyone</a>
+  {% for value, label in tier_filters %}
+    <a href="?q={{ q|urlencode }}&amp;tier={{ value }}"{% if tier == value %} class="on"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if page.object_list %}
+  <p class="muted" style="margin:.6rem 0 0">{{ total }} member{{ total|pluralize }}</p>
+  <div class="member-grid">
+    {% for p in page.object_list %}
+      <a class="member-card" href="{% url 'member_profile' p.member_id %}">
+        {% include "community/_avatar.html" with p=p %}
+        <span class="who">
+          <span class="nm">{{ p.name }}{% include "community/_seal.html" with p=p %}</span>
+          <span class="sub">{% include "community/_tier.html" with p=p %}{% if p.city %}<span>{{ p.city }}</span>{% endif %}</span>
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+  {% if page.has_other_pages %}
+    <div class="submit" style="justify-content:space-between">
+      {% if page.has_previous %}<a class="btn btn-ghost btn-sm" href="?q={{ q|urlencode }}&amp;tier={{ tier }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% else %}<span></span>{% endif %}
+      <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="btn btn-ghost btn-sm" href="?q={{ q|urlencode }}&amp;tier={{ tier }}&amp;page={{ page.next_page_number }}">Next →</a>{% else %}<span></span>{% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <div class="callout">{% if q or tier %}No members match that search. Try a different name, city, or tier.{% else %}Members will appear here as the movement grows.{% endif %}</div>
+{% endif %}
+{% endblock %}

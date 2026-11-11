@@ -48,15 +48,21 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ["display_name", "city", "phone", "sms_opt_in"]
+        fields = ["display_name", "city", "bio", "directory_visible", "phone", "sms_opt_in"]
         labels = {
             "display_name": "Display name",
             "city": "City",
+            "bio": "About you",
+            "directory_visible": "Show me in the member directory",
             "phone": "Phone number",
             "sms_opt_in": "Text me about my Dot",
         }
         help_texts = {
-            "city": "Used to match you to a local Dot.",
+            "display_name": "The name other members see.",
+            "city": "Used to match you to a local Dot. Shown on your member page.",
+            "bio": "A line or two other members will see on your page (300 characters).",
+            "directory_visible": "Other members can find your page, see your name, city and tier, and ask "
+                                 "to connect. Your email and phone are never shown. Turn this off to stay private.",
             "phone": "Optional. Pick your country, then enter your number — we store it in international format.",
             "sms_opt_in": "We only text if you opt in, and you can reply STOP anytime.",
         }
@@ -64,6 +70,8 @@ class ProfileForm(forms.ModelForm):
             "phone": forms.TextInput(attrs={"placeholder": "Phone number", "type": "tel",
                                             "autocomplete": "tel"}),
             "city": forms.TextInput(attrs={"placeholder": "e.g. Los Angeles"}),
+            "bio": forms.Textarea(attrs={"rows": 3, "maxlength": 300,
+                                         "placeholder": "What brought you here?"}),
         }
 
     def clean_phone(self):

@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{% url 'admin:accounts_profile_changelist' %}">Profiles</a> &rsaquo; Assign to an upline
+</div>
+{% endblock %}
+{% block content %}
+<p>Enter the Member ID of the person these {{ profiles|length }} member(s) will report to.
+   A Member reports to an Ambassador, an Ambassador to a Local Leader, and a Local Leader to a Regional —
+   anyone selected at the wrong tier is skipped.</p>
+<form method="post">{% csrf_token %}
+  <fieldset class="module aligned">
+    <div class="form-row">
+      {{ form.upline_member_id.errors }}
+      <div class="flex-container">
+        {{ form.upline_member_id.label_tag }} {{ form.upline_member_id }}
+      </div>
+      <div class="help">{{ form.upline_member_id.help_text }}</div>
+    </div>
+  </fieldset>
+  <h2>Selected</h2>
+  <ul>
+    {% for p in profiles %}
+      <li>{{ p.member_id }} — {{ p.name }} ({{ p.get_role_display }})
+        <input type="hidden" name="_selected_action" value="{{ p.pk }}"></li>
+    {% endfor %}
+  </ul>
+  <input type="hidden" name="action" value="assign_upline">
+  <div class="submit-row">
+    <input type="submit" name="apply" value="Assign" class="default">
+    <a href="{% url 'admin:accounts_profile_changelist' %}" class="button cancel-link">Cancel</a>
+  </div>
+</form>
+{% endblock %}

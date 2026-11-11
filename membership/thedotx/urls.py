@@ -9,6 +9,8 @@ urlpatterns = [
     path("", dots_views.home, name="home"),
     path("join/", include("billing.urls_join")),
     path("dots/", include("dots.urls")),
+    # Member community: directory, profiles, connections, messages, my team
+    path("members/", include("community.urls")),
     # Auth (allauth) + our profile pages under /accounts/
     path("accounts/", include("accounts.urls")),       # profile, edit (our views)
     path("accounts/", include("allauth.urls")),        # login, signup, password, etc.

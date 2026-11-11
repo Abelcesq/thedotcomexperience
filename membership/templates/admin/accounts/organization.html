@@ -1,0 +1,73 @@
+{% extends "admin/base_site.html" %}
+{% block extrastyle %}{{ block.super }}
+<style>
+  .org-totals{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 20px}
+  .org-totals div{border:1px solid var(--hairline-color,#ddd);border-radius:8px;padding:10px 16px;min-width:130px}
+  .org-totals b{display:block;font-size:1.5rem}
+  table.org{width:100%;margin-bottom:24px}
+  table.org td,table.org th{padding:8px 10px;vertical-align:middle}
+  table.org tr.regional td{font-weight:700;background:var(--darkened-bg,#f4f4f4)}
+  table.org tr.leader td:first-child{padding-left:28px;font-weight:600}
+  table.org tr.ambassador td:first-child{padding-left:56px}
+  .over{color:#c0392b;font-weight:700}
+  .muted{color:var(--body-quiet-color,#777)}
+</style>
+{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Home</a> &rsaquo;
+  <a href="{{ changelist_url }}">Profiles</a> &rsaquo; Organization report
+</div>
+{% endblock %}
+{% block content %}
+<div class="org-totals">
+  <div><b>{{ totals.members }}</b>Members</div>
+  <div><b>{{ totals.active_members }}</b>Active paying members</div>
+  <div><b>{{ totals.unassigned_members }}</b>Members with no Ambassador</div>
+  <div><b>{{ totals.ambassadors }}</b>Ambassadors</div>
+  <div><b>{{ totals.local_leaders }}</b>Local Leaders</div>
+  <div><b>{{ totals.regionals }}</b>Regionals</div>
+</div>
+<p class="muted">Caps: {{ caps.members_per_ambassador }} members per Ambassador ·
+  {{ caps.ambassadors_per_local_leader }} Ambassadors per Local Leader ·
+  {{ caps.local_leaders_per_regional }} Local Leaders per Regional.
+  "Active" counts genuine, paying members who are not Charter holders.</p>
+
+{% if regionals or unplaced_leaders or unplaced_ambassadors %}
+<table class="org">
+  <thead><tr>
+    <th>Name</th><th>Member ID</th><th>Tier</th><th>Local Leaders</th><th>Ambassadors</th>
+    <th>Members</th><th>Active paying</th>
+  </tr></thead>
+  <tbody>
+  {% for r in regionals %}
+    <tr class="regional">
+      <td><a href="{% url 'admin:accounts_profile_change' r.profile.pk %}">{{ r.profile.name }}</a></td>
+      <td>{{ r.profile.member_id }}</td><td>Regional</td>
+      <td {% if r.stats.over_cap %}class="over"{% endif %}>{{ r.stats.local_leaders }} / {{ r.stats.cap }}</td>
+      <td>{{ r.stats.ambassadors }}</td><td>{{ r.stats.members }}</td><td>{{ r.stats.active_members }}</td>
+    </tr>
+    {% for l in r.children %}
+      {% include "admin/accounts/_org_leader.html" with l=l %}
+    {% endfor %}
+  {% endfor %}
+  {% if unplaced_leaders %}
+    <tr class="regional"><td colspan="7">Local Leaders with no Regional</td></tr>
+    {% for l in unplaced_leaders %}
+      {% include "admin/accounts/_org_leader.html" with l=l %}
+    {% endfor %}
+  {% endif %}
+  {% if unplaced_ambassadors %}
+    <tr class="regional"><td colspan="7">Ambassadors with no Local Leader</td></tr>
+    {% for a in unplaced_ambassadors %}
+      {% include "admin/accounts/_org_ambassador.html" with a=a %}
+    {% endfor %}
+  {% endif %}
+  </tbody>
+</table>
+{% else %}
+<p>No Ambassadors, Local Leaders, or Regionals yet. Open <a href="{{ changelist_url }}">Profiles</a>,
+   select members, and use the "Set tier" actions to classify them.</p>
+{% endif %}
+<p><a class="button" href="{{ changelist_url }}">Back to Profiles</a></p>
+{% endblock %}

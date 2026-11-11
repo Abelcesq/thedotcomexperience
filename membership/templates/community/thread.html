@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ target.name }} — Messages{% endblock %}
+{% block content %}
+{% include "community/_subnav.html" with active="messages" %}
+
+<div class="person-row" style="border-bottom:1px solid var(--line);padding:1rem 0">
+  {% include "community/_avatar.html" with p=target %}
+  <div class="who">
+    <a href="{% url 'member_profile' target.member_id %}">{{ target.name }}</a>{% include "community/_seal.html" with p=target %}
+    <div class="sub">{% include "community/_tier.html" with p=target %} &nbsp;{{ target.member_id }}</div>
+  </div>
+  <div class="acts"><a class="btn btn-ghost btn-sm" href="{% url 'member_inbox' %}">← All messages</a></div>
+</div>
+
+<div class="chat" id="chat">
+  {% for m in thread %}
+    <div class="bubble{% if m.sender_id == request.user.id %} mine{% endif %}">{{ m.body }}<time datetime="{{ m.created_at|date:'c' }}">{{ m.created_at|date:"M j, g:i A" }}</time></div>
+  {% empty %}
+    <p class="muted">This is the start of your conversation with {{ target.name }}.</p>
+  {% endfor %}
+</div>
+
+{% if allowed %}
+<form method="post" class="compose">{% csrf_token %}
+  <label for="body" class="eyebrow" style="display:block;margin-bottom:.5rem">New message</label>
+  <textarea id="body" name="body" maxlength="{{ max_length }}" placeholder="Write a message…" required></textarea>
+  <div class="submit">
+    <button class="btn" type="submit">Send</button>
+    <span class="help">Private between the two of you. The Code of Conduct applies here: no selling, recruiting, or romantic pursuit. <a href="{% url 'member_profile' target.member_id %}">Block or report</a>.</span>
+  </div>
+</form>
+{% else %}
+  <div class="callout">You can no longer send messages in this conversation.</div>
+{% endif %}
+<script>(function(){var c=document.getElementById('chat'); if(c) c.scrollTop=c.scrollHeight;})();</script>
+{% endblock %}

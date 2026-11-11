@@ -1,0 +1,6 @@
+<tr class="ambassador">
+  <td><a href="{% url 'admin:accounts_profile_change' a.profile.pk %}">{{ a.profile.name }}</a></td>
+  <td>{{ a.profile.member_id }}</td><td>Ambassador</td><td>—</td><td>—</td>
+  <td {% if a.stats.over_cap %}class="over"{% endif %}>{{ a.stats.members }} / {{ a.stats.cap }}</td>
+  <td>{{ a.stats.active_members }}</td>
+</tr>

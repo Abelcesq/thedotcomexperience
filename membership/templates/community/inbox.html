@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Messages — The Dot Com Experience{% endblock %}
+{% block content %}
+<section class="hero" style="text-align:left">
+  <span class="eyebrow">The community</span>
+  <h1>Your <span class="gold">messages</span></h1>
+</section>
+{% include "community/_subnav.html" with active="messages" %}
+
+<div class="card">
+  {% for c in conversations %}{% with p=c.profile %}
+    <div class="person-row">
+      {% include "community/_avatar.html" with p=p %}
+      <div class="who">
+        <a href="{% url 'member_thread' p.member_id %}">{{ p.name }}</a>{% include "community/_seal.html" with p=p %}
+        <div class="sub">{% if c.last.sender_id == request.user.id %}You: {% endif %}{{ c.last.body|truncatechars:90 }}</div>
+      </div>
+      <div class="acts" style="align-items:center">
+        {% if c.unread %}<span class="unread-dot" title="{{ c.unread }} unread"></span>{% endif %}
+        <span class="sub">{{ c.last.created_at|date:"M j" }}</span>
+      </div>
+    </div>
+  {% endwith %}{% empty %}
+    <p class="muted">No messages yet. Open a <a href="{% url 'connections' %}">connection</a> and say hello.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "accounts",
     "dots",
     "billing",
+    "community",
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "billing.context_processors.membership_flags",
+                "community.context_processors.community_counts",
             ],
         },
     },
@@ -131,6 +133,20 @@ if env_bool("USE_SMTP", False):
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "The Dot Com Experience <info@thedotcomexperience.com>")
+
+# --- Organization (tiers) -------------------------------------------------
+# Size limits from the Charter schedules. Going over shows a warning in the admin;
+# it does not block the save (the Charters allow short, approved exceptions).
+TIER_CAPS = {
+    "members_per_ambassador": int(os.environ.get("CAP_MEMBERS_PER_AMBASSADOR", "30")),
+    "ambassadors_per_local_leader": int(os.environ.get("CAP_AMBASSADORS_PER_LOCAL_LEADER", "10")),
+    "local_leaders_per_regional": int(os.environ.get("CAP_LOCAL_LEADERS_PER_REGIONAL", "10")),
+}
+
+# --- Community (directory, connections, messages) -------------------------
+COMMUNITY_MAX_REQUESTS_PER_DAY = int(os.environ.get("COMMUNITY_MAX_REQUESTS_PER_DAY", "20"))
+COMMUNITY_MAX_MESSAGES_PER_5_MIN = int(os.environ.get("COMMUNITY_MAX_MESSAGES_PER_5_MIN", "30"))
+COMMUNITY_MESSAGE_MAX_LENGTH = 2000
 
 # --- Stripe ---------------------------------------------------------------
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")

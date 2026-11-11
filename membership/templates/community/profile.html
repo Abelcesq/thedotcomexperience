@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ target.name }} — The Dot Com Experience{% endblock %}
+{% block content %}
+{% if state == 'self' %}{% include "community/_subnav.html" with active="me" %}{% else %}{% include "community/_subnav.html" with active="" %}{% endif %}
+
+<div class="pf">
+  {% include "community/_avatar.html" with p=target size="lg" %}
+  <div class="pf-body">
+    <h1 class="pf-name">{{ target.name }}{% include "community/_seal.html" with p=target %}</h1>
+    <div class="pf-meta">
+      {% include "community/_tier.html" with p=target %}
+      <span class="pf-id">{{ target.member_id }}</span>
+      {% if target.city %}<span>· {{ target.city }}</span>{% endif %}
+    </div>
+    <div class="pf-stats">
+      <div><b>{{ connection_count }}</b>connection{{ connection_count|pluralize }}</div>
+      {% if stats %}
+        {% if target.role == 'regional' %}<div><b>{{ stats.local_leaders }}</b>local leader{{ stats.local_leaders|pluralize }}</div>{% endif %}
+        {% if target.role != 'ambassador' %}<div><b>{{ stats.ambassadors }}</b>ambassador{{ stats.ambassadors|pluralize }}</div>{% endif %}
+        <div><b>{{ stats.members }}</b>member{{ stats.members|pluralize }}</div>
+      {% endif %}
+      <div><b>{{ target.user.date_joined|date:"M Y" }}</b>joined</div>
+    </div>
+    {% if target.bio %}<p class="pf-bio">{{ target.bio }}</p>{% endif %}
+
+    <div class="pf-actions">
+      {% if state == 'self' %}
+        <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>
+        <a class="btn btn-ghost btn-sm" href="{% url 'profile' %}">Account &amp; billing</a>
+      {% else %}
+        {% if state == 'none' %}
+          <form method="post" action="{% url 'member_connect' target.member_id %}">{% csrf_token %}<button class="btn btn-sm" type="submit">Connect</button></form>
+        {% elif state == 'requested' %}
+          <form method="post" action="{% url 'member_disconnect' target.member_id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-ghost btn-sm" type="submit">Request sent · Cancel</button></form>
+        {% elif state == 'incoming' %}
+          <form method="post" action="{% url 'member_accept' target.member_id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-sm" type="submit">Accept request</button></form>
+          <form method="post" action="{% url 'member_decline' target.member_id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-ghost btn-sm" type="submit">Decline</button></form>
+        {% elif state == 'connected' %}
+          <span class="btn btn-ghost btn-sm" style="cursor:default">✓ Connected</span>
+        {% endif %}
+        {% if can_message %}<a class="btn {% if state != 'connected' %}btn-ghost {% endif %}btn-sm" href="{% url 'member_thread' target.member_id %}">Message</a>{% endif %}
+      {% endif %}
+    </div>
+    {% if same_line %}<p class="help">You and {{ target.name }} are in the same group, so you can message each other directly.</p>
+    {% elif state == 'none' or state == 'requested' %}<p class="help">Once {{ target.name }} accepts your request, you can message each other.</p>{% endif %}
+  </div>
+</div>
+
+{% if state != 'self' %}
+<details class="more">
+  <summary>Block or report</summary>
+  {% if state == 'connected' %}
+    <form method="post" action="{% url 'member_disconnect' target.member_id %}" style="margin:.8rem 0">{% csrf_token %}
+      <button class="btn btn-ghost btn-sm" type="submit">Remove connection</button>
+    </form>
+  {% endif %}
+  {% if i_blocked %}
+    <form method="post" action="{% url 'member_unblock' target.member_id %}" style="margin:.8rem 0">{% csrf_token %}
+      <button class="btn btn-ghost btn-sm" type="submit">Unblock {{ target.name }}</button>
+    </form>
+  {% else %}
+    <form method="post" action="{% url 'member_block' target.member_id %}" style="margin:.8rem 0">{% csrf_token %}
+      <button class="btn btn-danger btn-sm" type="submit">Block {{ target.name }}</button>
+      <span class="help">They won't be able to see your profile, connect, or message you.</span>
+    </form>
+  {% endif %}
+  <form method="post" action="{% url 'member_report' target.member_id %}">{% csrf_token %}
+    <label for="reason">Report a Code of Conduct concern to our team</label>
+    <textarea id="reason" name="reason" maxlength="1000" placeholder="What happened?" required></textarea>
+    <button class="btn btn-danger btn-sm" type="submit">Send report</button>
+    <span class="help">Your recent conversation with this member is shared with our team for review.</span>
+  </form>
+</details>
+{% endif %}
+{% endblock %}

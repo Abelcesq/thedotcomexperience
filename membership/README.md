@@ -29,6 +29,19 @@ local-circle finder, the **Request a new Dot location** application, and
   request a new location.
 - **Request a new Dot location** (`/dots/request/`): a vetted **application**
   (a vetted application) — reviewed and promoted to Ambassador by an admin.
+- **Member IDs & tiers**: every account gets a permanent, unique Member ID
+  (`DX-000000`). Everyone starts as a **Member**; staff classify **Ambassador →
+  Local Leader → Regional** in the admin. Each person reports to the tier
+  directly above (`reports_to`), and every tier change is logged.
+- **Organization report** (`/admin/accounts/profile/organization/`): members
+  (total / active-paying) per Ambassador, Local Leader, and Regional against the
+  Charter caps (30 / 10 / 10; `TIER_CAPS`). Over-cap is a warning, not a block.
+- **Community** (`/members/`): directory with tier badges, member pages,
+  connection requests, private messages, block + report, and a "My team" view
+  for Charter holders. Email, phone, and billing are never shown to members.
+  Messaging requires a connection or a direct upline/downline link.
+- **Not built (on purpose)**: payouts. Compensation is tracked nowhere yet —
+  the Charter plan is pending attorney review.
 - **Admin** (`/admin/`): manage Dots, applications, waitlist, and members;
   one-click **promote to Ambassador**.
 
@@ -86,6 +99,12 @@ waitlist, and the four Stripe webhook transitions with signature verification.
 - **Forfeiture of fees** on removal for a Code-of-Conduct violation is stated in
   the public `/terms/` (served by the Node site today) and in the signup consent.
 - SMS: consent captured now; **do not send** until A2P 10DLC + STOP/HELP are done.
+
+## Tests
+
+```bash
+DJANGO_DEBUG=true python manage.py test accounts community
+```
 
 ## Still to do before launch (honest list)
 

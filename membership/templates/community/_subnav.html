@@ -1,0 +1,7 @@
+<nav class="subnav" aria-label="Community">
+  <a href="{% url 'member_directory' %}"{% if active == 'directory' %} class="on"{% endif %}>Members</a>
+  <a href="{% url 'connections' %}"{% if active == 'connections' %} class="on"{% endif %}>Connections{% if pending_requests %}<span class="count">{{ pending_requests }}</span>{% endif %}</a>
+  <a href="{% url 'member_inbox' %}"{% if active == 'messages' %} class="on"{% endif %}>Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
+  {% if my_profile.is_charter_holder %}<a href="{% url 'my_team' %}"{% if active == 'team' %} class="on"{% endif %}>My team</a>{% endif %}
+  <a href="{% url 'member_profile' my_profile.member_id %}"{% if active == 'me' %} class="on"{% endif %}>My page</a>
+</nav>

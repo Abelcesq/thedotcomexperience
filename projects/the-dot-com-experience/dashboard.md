@@ -4,7 +4,7 @@
 > rhythm in `command-center.md`. A future portfolio-level manager reads this for a 30-second
 > roll-up.
 
-**Last updated:** 2026-06-29 · **Updated by:** Claude (PM) · **Phase:** 2 (front door LIVE; building audience → Skool)
+**Last updated:** 2026-11-11 · **Updated by:** Claude (PM) · **Phase:** 2 (front door LIVE; building audience → Skool)
 
 ## Status at a glance
 | Pillar | State | Note |
@@ -18,6 +18,8 @@
 | Community home (Skool) | 🟢 | Live: the-dot-comp-experience-1714. The funnel's destination. |
 | Email capture | 🟢 **LIVE** | Form → Heroku → **MailerLite** (owned list, free ≤1,000). Verified end-to-end (test subscriber landed). |
 | Audience / list | 🟡 | IG + X presence underway; capture now owned in MailerLite. Next: drive traffic + a welcome automation. |
+| Member platform | 🟢 **LIVE** | members.thedotx.com (Django, Heroku `thedotx-members`): accounts, $100/mo Stripe billing on the 1st, Member IDs, four tiers, org report, directory, connections, messages. |
+| Compensation plan | 🔴 | Designed (Charter docs) but **not built and not payable** until an FTC/direct-selling attorney and CA employment counsel review it. |
 | Offer / events | 🔴 | First in-person event not yet defined — the moat, Phase 3+. |
 
 ## Current focus
@@ -33,6 +35,10 @@ bridge (standard CTA + launch posts), and scope the first local event.
 5. Faith framing: explicit / friendly / universal.
 
 ## Recent activity
+- 2026-11-11 — **Tiers + community** in the member platform: unique Member IDs, Member →
+  Ambassador → Local Leader → Regional with upline links and an admin organization report
+  (caps 30/10/10), member directory, connections, private messaging with block/report.
+  Privacy Policy updated to match. Payouts deliberately not built (attorney review pending).
 - 2026-07-03 — **Multi-site funnel**: abelcalderon.com (Squarespace) can now feed the same
   funnel (CORS + `source` tag). New source-aware welcome — abelcalderon.com signups get a
   "My Path to Me" email inviting them into the community; thedotx signups get the Dot Com

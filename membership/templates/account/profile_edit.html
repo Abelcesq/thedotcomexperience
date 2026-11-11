@@ -20,7 +20,7 @@
   <form method="post" class="cols" novalidate>
     {% csrf_token %}
     {% for field in form %}
-      {% if field.name == 'sms_opt_in' %}
+      {% if field.name == 'sms_opt_in' or field.name == 'directory_visible' %}
         <div class="formrow">
           <label class="checkbox">{{ field }} <span>{{ field.label }}</span></label>
           {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
