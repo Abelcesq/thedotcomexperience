@@ -6,4 +6,5 @@ dj-database-url>=2.2
 gunicorn>=23
 whitenoise>=6.7
 python-dotenv>=1.0
+phonenumbers>=8.13,<10    # validates phone numbers and stores them in international (E.164) form
 psycopg[binary]>=3.2      # PostgreSQL driver (Heroku); dev uses SQLite

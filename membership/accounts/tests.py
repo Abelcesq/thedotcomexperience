@@ -171,7 +171,57 @@ class OwnProfilePageTests(TestCase):
         me = make("me@x.com")
         self.client.force_login(me.user)
         self.client.post(reverse("profile_edit"), {"display_name": "Mia", "city": "Davis",
-                                                    "bio": "Here to grow.", "phone": ""})
+                                                    "bio": "Here to grow.", "phone_country": "US",
+                                                    "phone_number": ""})
         me.refresh_from_db()
         self.assertEqual(me.bio, "Here to grow.")
         self.assertFalse(me.directory_visible)
+
+
+class PhoneTests(TestCase):
+    def setUp(self):
+        self.me = make("me@x.com")
+        self.client.force_login(self.me.user)
+        self.url = reverse("profile_edit")
+
+    def save(self, country, number, **extra):
+        data = {"display_name": "Mia", "city": "Davis", "bio": "", "directory_visible": "on",
+                "phone_country": country, "phone_number": number, **extra}
+        resp = self.client.post(self.url, data)
+        self.me.refresh_from_db()
+        return resp
+
+    def test_country_code_plus_number_is_stored_in_international_format(self):
+        for country, typed, stored in [
+            ("US", "(916) 555-0123", "+19165550123"),
+            ("US", "916.555.0123", "+19165550123"),
+            ("MX", "55 1234 5678", "+525512345678"),
+            ("GB", "07400 123456", "+447400123456"),      # the leading 0 is dropped correctly
+            ("US", "+44 7400 123456", "+447400123456"),   # a full international number wins
+        ]:
+            self.assertEqual(self.save(country, typed).status_code, 302, (country, typed))
+            self.assertEqual(self.me.phone, stored)
+
+    def test_incomplete_or_nonsense_numbers_are_rejected_and_nothing_is_saved(self):
+        self.save("US", "(916) 555-0123")
+        for bad in ("555", "not a number", "12345678901234567890"):
+            resp = self.save("US", bad)
+            self.assertContains(resp, "complete phone number")
+            self.assertEqual(self.me.phone, "+19165550123")
+
+    def test_blank_clears_the_number_and_texts_need_a_number(self):
+        self.save("US", "(916) 555-0123")
+        self.save("US", "")
+        self.assertEqual(self.me.phone, "")
+        resp = self.save("US", "", sms_opt_in="on")
+        self.assertContains(resp, "Add a phone number")
+        self.assertFalse(self.me.sms_opt_in)
+
+    def test_saved_number_is_shown_split_into_country_and_local_parts(self):
+        self.save("MX", "55 1234 5678")
+        form = self.client.get(self.url).context["form"]
+        self.assertEqual(form.fields["phone_country"].initial, "MX")
+        self.assertEqual(form.fields["phone_number"].initial, "55 1234 5678")
+        page = self.client.get(self.url)
+        self.assertContains(page, "Mexico (+52)")
+        self.assertNotContains(page, "cdnjs")

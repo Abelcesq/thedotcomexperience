@@ -192,3 +192,14 @@ details.more textarea{width:100%;min-height:70px;margin:.6rem 0;padding:.7rem .9
 .btn-danger{background:transparent;color:#f0c9c9;border:1px solid rgba(227,155,155,.45)}
 .btn-danger:hover{background:rgba(227,155,155,.1);border-color:#e39b9b}
 @media(max-width:640px){.pf{flex-direction:column;align-items:flex-start;gap:1.2rem}.avatar.lg{width:104px;height:104px;font-size:2.1rem}.bubble{max-width:90%}}
+/* Phone: country code + number, joined */
+.phone-row{display:flex;align-items:flex-end}
+.phone-row .phone-cc{flex:0 0 6.6rem}
+.phone-row .phone-num{flex:1 1 auto;min-width:0}
+.phone-row select{width:100%;height:3.05rem;padding:0 2rem 0 1rem;border:1px solid var(--line);border-right:none;border-radius:10px 0 0 10px;
+  background:#060f1d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%239bb0c7' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .8rem center;
+  color:var(--ink);font-family:var(--font-body);font-size:1rem;appearance:none;-webkit-appearance:none;cursor:pointer}
+.phone-row select option{background:#0c1f36;color:var(--ink)}
+.phone-row .phone-num input{height:3.05rem;border-radius:0 10px 10px 0}
+.phone-row select:focus{outline:2px solid var(--gold-solid);outline-offset:1px;border-color:transparent;position:relative;z-index:1}
+.phone-row .phone-num input:focus{position:relative;z-index:1}

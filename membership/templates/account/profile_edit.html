@@ -1,16 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Edit profile — The Dot Com Experience{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/css/intlTelInput.min.css">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/intlTelInput.min.js"></script>
-<style>
-  .iti{width:100%}
-  .iti__flag{background-image:url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/img/flags.png")}
-  @media (-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
-    .iti__flag{background-image:url("https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/img/flags@2x.png")}}
-  .iti__country-list{color:#1a2230;max-width:min(92vw,360px)}
-  .iti--separate-dial-code .iti__selected-dial-code{color:var(--ink)}
-</style>
 <section class="hero" style="text-align:left">
   <span class="eyebrow">Member</span>
   <h1>Edit your <span class="gold">profile</span></h1>
@@ -26,6 +16,22 @@
           {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
           {{ field.errors }}
         </div>
+      {% elif field.name == 'phone_country' %}
+        <div class="formrow">
+          <div class="phone-row">
+            <div class="field phone-cc">
+              <label for="{{ form.phone_country.id_for_label }}">Country</label>
+              {{ form.phone_country }}
+            </div>
+            <div class="field phone-num">
+              <label for="{{ form.phone_number.id_for_label }}">Phone</label>
+              {{ form.phone_number }}
+            </div>
+          </div>
+          <p class="helptext">Optional. Choose your country code, then enter your number.</p>
+          {{ form.phone_country.errors }}{{ form.phone_number.errors }}
+        </div>
+      {% elif field.name == 'phone_number' %}
       {% else %}
         <div class="field formrow">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -43,25 +49,23 @@
 </div>
 
 <script>
-  // International phone input: country picker + auto-format to E.164 on submit.
-  window.addEventListener('DOMContentLoaded', function(){
-    var input = document.getElementById('id_phone');
-    if(!input || typeof window.intlTelInput === 'undefined') return;
-    var iti = window.intlTelInput(input, {
-      initialCountry: "us",
-      separateDialCode: true,
-      preferredCountries: ["us", "ca", "gb", "mx"],
-      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.2.1/js/utils.js"
+  // Country dropdown: show just the dialing code (+1) when closed, full names when open.
+  (function(){
+    var sel = document.getElementById('id_phone_country');
+    if(!sel) return;
+    Array.prototype.forEach.call(sel.options, function(o){
+      o.dataset.full = o.textContent;
+      var m = o.textContent.match(/\(\+(\d+)\)\s*$/);
+      o.dataset.code = m ? '+' + m[1] : o.textContent;
     });
-    // If a stored number exists (E.164), load it so the right country is shown.
-    if(input.value){ iti.setNumber(input.value); }
-    var form = input.closest('form');
-    if(form){
-      form.addEventListener('submit', function(){
-        // Replace the field value with full international format before posting.
-        if(input.value.trim()){ input.value = iti.getNumber(); }
-      });
-    }
-  });
+    function compact(){ Array.prototype.forEach.call(sel.options, function(o){
+      o.textContent = o.selected ? o.dataset.code : o.dataset.full; }); }
+    function expand(){ Array.prototype.forEach.call(sel.options, function(o){ o.textContent = o.dataset.full; }); }
+    sel.addEventListener('mousedown', expand);
+    sel.addEventListener('keydown', expand);
+    sel.addEventListener('change', compact);
+    sel.addEventListener('blur', compact);
+    compact();
+  })();
 </script>
 {% endblock %}

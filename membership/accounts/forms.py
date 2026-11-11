@@ -1,10 +1,19 @@
-import re
-
+import phonenumbers
 from allauth.account.forms import SignupForm
 from django import forms
 from django.utils import timezone
 
+from .countries import COUNTRIES, PREFERRED
 from .models import Profile
+
+
+def _country_choices():
+    """Preferred countries first, then everyone alphabetically. Label: "Mexico (+52)"."""
+    by_iso = {iso: (name, dial) for iso, name, dial in COUNTRIES}
+    label = lambda iso: f"{by_iso[iso][0]} (+{by_iso[iso][1]})"
+    top = [(iso, label(iso)) for iso in PREFERRED]
+    rest = [(iso, label(iso)) for iso, _n, _d in COUNTRIES if iso not in PREFERRED]
+    return top + rest
 
 
 COC_LABEL = (
@@ -44,17 +53,30 @@ class DotxSignupForm(SignupForm):
 
 
 class ProfileForm(forms.ModelForm):
-    """Member profile details: display name, city, phone + SMS consent."""
+    """Member profile details: display name, city, bio, phone (country code + number), SMS consent.
+
+    The phone is entered as a country dialing code plus a local number and stored as one
+    international (E.164) number, e.g. +19165550123.
+    """
+
+    phone_country = forms.ChoiceField(
+        label="Country", required=False, choices=_country_choices, initial="US",
+        widget=forms.Select(attrs={"autocomplete": "tel-country-code", "aria-label": "Country code"}),
+    )
+    phone_number = forms.CharField(
+        label="Phone", required=False, max_length=32,
+        widget=forms.TextInput(attrs={"placeholder": "Your phone number", "type": "tel",
+                                      "inputmode": "tel", "autocomplete": "tel-national"}),
+    )
 
     class Meta:
         model = Profile
-        fields = ["display_name", "city", "bio", "directory_visible", "phone", "sms_opt_in"]
+        fields = ["display_name", "city", "bio", "directory_visible", "sms_opt_in"]
         labels = {
             "display_name": "Display name",
             "city": "City",
             "bio": "About you",
             "directory_visible": "Show me in the member directory",
-            "phone": "Phone number",
             "sms_opt_in": "Text me about my Dot",
         }
         help_texts = {
@@ -63,32 +85,52 @@ class ProfileForm(forms.ModelForm):
             "bio": "A line or two other members will see on your page (300 characters).",
             "directory_visible": "Other members can find your page, see your name, city and tier, and ask "
                                  "to connect. Your email and phone are never shown. Turn this off to stay private.",
-            "phone": "Optional. Pick your country, then enter your number — we store it in international format.",
             "sms_opt_in": "We only text if you opt in, and you can reply STOP anytime.",
         }
         widgets = {
-            "phone": forms.TextInput(attrs={"placeholder": "Phone number", "type": "tel",
-                                            "autocomplete": "tel"}),
             "city": forms.TextInput(attrs={"placeholder": "e.g. Los Angeles"}),
             "bio": forms.Textarea(attrs={"rows": 3, "maxlength": 300,
                                          "placeholder": "What brought you here?"}),
         }
 
-    def clean_phone(self):
-        phone = (self.cleaned_data.get("phone") or "").strip()
-        if not phone:
-            return phone
-        # The country picker submits E.164 (+<country><number>). Strip any stray
-        # formatting (spaces, parens, dashes) just in case, then validate.
-        cleaned = re.sub(r"[\s()\-.]", "", phone)
-        if not re.fullmatch(r"\+\d{8,15}", cleaned):
-            raise forms.ValidationError(
-                "Enter a valid phone number in international format, e.g. +13105551234."
-            )
-        return cleaned
+    field_order = ["display_name", "city", "bio", "directory_visible",
+                   "phone_country", "phone_number", "sms_opt_in"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Show a saved number split back into its country and local parts.
+        stored = self.instance.phone if self.instance and self.instance.pk else ""
+        if stored:
+            try:
+                parsed = phonenumbers.parse(stored, None)
+                region = phonenumbers.region_code_for_number(parsed)
+                if region:
+                    self.fields["phone_country"].initial = region
+                self.fields["phone_number"].initial = phonenumbers.format_number(
+                    parsed, phonenumbers.PhoneNumberFormat.NATIONAL)
+            except phonenumbers.NumberParseException:
+                self.fields["phone_number"].initial = stored
 
     def clean(self):
         cleaned = super().clean()
-        if cleaned.get("sms_opt_in") and not cleaned.get("phone"):
-            self.add_error("phone", "Add a phone number to receive texts about your Dot.")
+        raw = (cleaned.get("phone_number") or "").strip()
+        country = cleaned.get("phone_country") or "US"
+        phone = ""
+        if raw:
+            try:
+                parsed = phonenumbers.parse(raw, country)
+            except phonenumbers.NumberParseException:
+                parsed = None
+            if parsed is None or not phonenumbers.is_possible_number(parsed):
+                self.add_error("phone_number",
+                               "That doesn't look like a complete phone number for the country selected.")
+            else:
+                phone = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+        cleaned["phone"] = phone
+        if cleaned.get("sms_opt_in") and not phone and "phone_number" not in self.errors:
+            self.add_error("phone_number", "Add a phone number to receive texts about your Dot.")
         return cleaned
+
+    def save(self, commit=True):
+        self.instance.phone = self.cleaned_data.get("phone", "")
+        return super().save(commit=commit)
