@@ -15,6 +15,8 @@
   <div class="row"><span class="k">A seat in a small, chartered, Ambassador-led in-person Dot</span><span class="v">When one opens near you</span></div>
   <div class="row"><span class="k">Cancel anytime from your profile</span><span class="v">No pressure</span></div>
 
+  <p class="help" style="margin-top:1rem">Billing is on the <strong>1st of every month</strong>. If you join mid-month, your first charge is <strong>prorated</strong> for the days remaining — then it&rsquo;s {{ MEMBERSHIP_PRICE_LABEL }} on the 1st going forward.</p>
+
   <div class="submit">
     {% if STRIPE_CONFIGURED %}
       <form method="post" action="{% url 'checkout' %}" class="inline-form">{% csrf_token %}
