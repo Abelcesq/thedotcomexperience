@@ -9,8 +9,8 @@ from .models import Profile
 
 COC_LABEL = (
     'I have read and agree to the '
-    '<a href="/terms/" target="_blank" rel="noopener">Terms</a> and the '
-    '<a href="/terms/#conduct" target="_blank" rel="noopener">Code of Conduct</a>, '
+    '<a href="https://www.thedotx.com/terms" target="_blank" rel="noopener">Terms</a> and the '
+    '<a href="https://www.thedotx.com/terms#conduct" target="_blank" rel="noopener">Code of Conduct</a>, '
     "including that membership fees are forfeited if I am removed for a violation."
 )
 
