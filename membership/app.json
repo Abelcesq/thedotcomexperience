@@ -1,6 +1,6 @@
 {
   "name": "The Dot Com Experience — Membership",
-  "description": "Member auth, $20/mo Stripe subscription, profiles, and the Dots finder (Django).",
+  "description": "Member auth, $100/mo Stripe subscription, profiles, and the Dots finder (Django).",
   "repository": "https://github.com/Abelcesq/thedotcomexperience",
   "keywords": ["django", "stripe", "membership"],
   "stack": "heroku-24",
@@ -27,7 +27,7 @@
     "STRIPE_SECRET_KEY": { "required": false },
     "STRIPE_PRICE_ID": { "required": false },
     "STRIPE_WEBHOOK_SECRET": { "required": false },
-    "MEMBERSHIP_PRICE_LABEL": { "value": "$20 / month" }
+    "MEMBERSHIP_PRICE_LABEL": { "value": "$100 / month" }
   },
   "addons": [
     { "plan": "heroku-postgresql:essential-0" }

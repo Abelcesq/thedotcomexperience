@@ -28,7 +28,7 @@ def ensure_customer(profile):
 
 
 def create_checkout_session(profile, success_url, cancel_url):
-    """Hosted Checkout for the $20/mo subscription (PCI stays with Stripe)."""
+    """Hosted Checkout for the $100/mo subscription (PCI stays with Stripe)."""
     s = _client()
     customer_id = ensure_customer(profile)
     return s.checkout.Session.create(

@@ -135,11 +135,11 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "The Dot Com Experienc
 # --- Stripe ---------------------------------------------------------------
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")          # the $20/mo recurring Price
+STRIPE_PRICE_ID = os.environ.get("STRIPE_PRICE_ID", "")          # the $100/mo recurring Price
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 STRIPE_ALLOW_PROMOTION_CODES = env_bool("STRIPE_ALLOW_PROMOTION_CODES", True)
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")   # for Stripe return URLs
-MEMBERSHIP_PRICE_LABEL = os.environ.get("MEMBERSHIP_PRICE_LABEL", "$20 / month")
+MEMBERSHIP_PRICE_LABEL = os.environ.get("MEMBERSHIP_PRICE_LABEL", "$100 / month")
 
 # --- i18n / tz ------------------------------------------------------------
 LANGUAGE_CODE = "en-us"

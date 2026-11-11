@@ -1,6 +1,6 @@
 # The Dot Com Experience — Membership Platform (Django)
 
-The member engine for The Dot Com Experience: accounts, the **$20/mo Stripe
+The member engine for The Dot Com Experience: accounts, the **$100/mo Stripe
 subscription** (hosted Checkout + Customer Portal, modeled on the Tasks app /
 ezaitask.com), member **profiles** (city, phone, SMS opt-in), the **Dots**
 local-circle finder, the **Request a new Dot location** application, and
@@ -14,7 +14,7 @@ local-circle finder, the **Request a new Dot location** application, and
 - **Auth** via django-allauth (email login, signup, password reset). Signup
   **requires a Code of Conduct checkbox** — you cannot create an account without
   agreeing; the consent + timestamp are stored on the profile.
-- **$20/mo subscription**: `/join/` → hosted Stripe Checkout (`mode=subscription`)
+- **$100/mo subscription**: `/join/` → hosted Stripe Checkout (`mode=subscription`)
   → success returns to `/accounts/profile/?stripe=ok`. **The Stripe webhook is the
   source of truth** (`/stripe/webhook/`, signature-verified): it sets membership
   active / past_due / canceled and stores the renewal date.
@@ -53,7 +53,7 @@ no charge is attempted. Add Stripe test keys to exercise real checkout.
 
 ### Stripe setup (test mode first)
 
-1. In the Stripe dashboard, create a **Product** with a **$20/month recurring
+1. In the Stripe dashboard, create a **Product** with a **$100/month recurring
    Price**. Copy the Price id (`price_…`) into `STRIPE_PRICE_ID`.
 2. Set `STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` (test keys).
 3. Webhook: run `stripe listen --forward-to localhost:8000/stripe/webhook/`

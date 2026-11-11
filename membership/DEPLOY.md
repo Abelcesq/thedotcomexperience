@@ -37,7 +37,7 @@ heroku config:set -a thedotx-members \
   DJANGO_DEBUG=false \
   DJANGO_ALLOWED_HOSTS="members.thedotx.com,.herokuapp.com" \
   SITE_URL="https://members.thedotx.com" \
-  MEMBERSHIP_PRICE_LABEL='$20 / month'
+  MEMBERSHIP_PRICE_LABEL='$100 / month'
 ```
 
 The live site's "Log in" and "Become a member" buttons point to
@@ -87,7 +87,7 @@ after) you deploy the updated Node site.
 
 ## 4. Wire Stripe (test mode)
 
-1. In the Stripe dashboard (test mode), create a **Product** with a **$20.00 /
+1. In the Stripe dashboard (test mode), create a **Product** with a **$100.00 /
    month recurring Price**. Copy the Price id (`price_…`).
 2. Set the keys:
    ```bash
