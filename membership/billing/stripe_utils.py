@@ -1,6 +1,24 @@
 """Thin helpers around the Stripe SDK. All calls are no-ops if Stripe isn't configured."""
+from datetime import datetime, timezone
+
 from django.conf import settings
 import stripe
+
+
+def _first_of_next_month_ts(now=None):
+    """Unix timestamp for 12:00 UTC on the 1st of next month.
+
+    Noon UTC keeps the billing date on the 1st across all US time zones
+    (and most of the world), so members see the charge land on the 1st.
+    """
+    now = now or datetime.now(timezone.utc)
+    year, month = now.year, now.month
+    if month == 12:
+        year, month = year + 1, 1
+    else:
+        month += 1
+    anchor = datetime(year, month, 1, 12, 0, 0, tzinfo=timezone.utc)
+    return int(anchor.timestamp())
 
 
 def configured():
@@ -28,9 +46,22 @@ def ensure_customer(profile):
 
 
 def create_checkout_session(profile, success_url, cancel_url):
-    """Hosted Checkout for the $100/mo subscription (PCI stays with Stripe)."""
+    """Hosted Checkout for the $100/mo subscription (PCI stays with Stripe).
+
+    Every member is aligned to bill on the 1st of the month. For anyone who
+    joins mid-month, the new subscription's billing cycle is anchored to the
+    1st of next month and Stripe prorates the partial first month (charged at
+    checkout); the full $100 is then billed on the 1st every month after.
+    Members who happen to join on the 1st pay the full $100 now and are already
+    on a 1st-of-month cycle, so no anchor is needed.
+    """
     s = _client()
     customer_id = ensure_customer(profile)
+    sub_data = {"metadata": {"user_id": str(profile.user_id)}}
+    now = datetime.now(timezone.utc)
+    if now.day != 1:
+        sub_data["billing_cycle_anchor"] = _first_of_next_month_ts(now)
+        sub_data["proration_behavior"] = "create_prorations"
     return s.checkout.Session.create(
         mode="subscription",
         customer=customer_id,
@@ -39,7 +70,7 @@ def create_checkout_session(profile, success_url, cancel_url):
         allow_promotion_codes=settings.STRIPE_ALLOW_PROMOTION_CODES,
         success_url=success_url,
         cancel_url=cancel_url,
-        subscription_data={"metadata": {"user_id": str(profile.user_id)}},
+        subscription_data=sub_data,
     )
 
 
