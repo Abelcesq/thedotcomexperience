@@ -434,6 +434,7 @@
   </div>
 </footer>
 
+<script src="/assets/capture.js"></script>
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
 
@@ -451,26 +452,26 @@
         if(applyNote) applyNote.hidden = !(reqEl && reqEl.value === 'request_location');
       });
     });
-    f.addEventListener('submit', function(e){
-      e.preventDefault(); err.hidden = true;
-      var email = (em.value||'').trim();
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ fail('Please enter a valid email.'); em.focus(); return; }
-      btn.disabled = true;
-      var intentEl = f.querySelector('input[name=intent]:checked');
-      var payload = {
-        email: email,
-        name: (document.getElementById('fn').value||'').trim(),
-        city: (document.getElementById('city').value||'').trim(),
-        intent: intentEl ? intentEl.value : 'join',
-        source: 'thedotx.com/dots'
-      };
-      fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-        .then(function(r){ return r.json().catch(function(){ return {ok:r.ok}; }); })
-        .then(function(d){ if(d&&d.ok){
-            if(payload.intent === 'request_location'){ ok.textContent = 'Thank you — your request is in. Chartering a new Dot is an application and training process, and we’ll email you the next steps to apply as an ambassador. Experience the Experience.'; }
-            sub.hidden=true; f.querySelectorAll('.field').forEach(function(x){x.style.display='none';}); ok.hidden=false; }
-          else { fail((d&&d.error)||'Something went wrong. Please try again.'); btn.disabled=false; } })
-        .catch(function(){ fail('Network error. Please try again.'); btn.disabled=false; });
+    // Sign-up is protected: a captcha (when configured) and a 6-digit code emailed to the
+    // address. Nothing is added to the list until the code is confirmed. See assets/capture.js.
+    DotxCapture.attach(f, {
+      payload: function(){
+        var intentEl = f.querySelector('input[name=intent]:checked');
+        return {
+          email: (em.value||'').trim(),
+          name: (document.getElementById('fn').value||'').trim(),
+          city: (document.getElementById('city').value||'').trim(),
+          intent: intentEl ? intentEl.value : 'join',
+          source: 'thedotx.com/dots'
+        };
+      },
+      fail: function(m){ if(m){ fail(m); } else { err.hidden = true; } },
+      busy: function(b){ btn.disabled = b; },
+      hide: function(){ return [sub].concat(Array.prototype.slice.call(f.querySelectorAll('.field'))); },
+      done: function(d){
+        if(d && d.intent === 'request_location'){ ok.textContent = 'Thank you — your request is in. Chartering a new Dot is an application and training process, and we’ll email you the next steps to apply as an ambassador. Experience the Experience.'; }
+        sub.hidden = true; f.querySelectorAll('.field').forEach(function(x){ x.style.display='none'; }); err.hidden = true; ok.hidden = false;
+      }
     });
   })();
 

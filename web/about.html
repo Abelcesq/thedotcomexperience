@@ -342,6 +342,7 @@ footer a:hover{color:var(--gold);}
   </div>
 </footer>
 
+<script src="/assets/capture.js"></script>
 <script>
 // footer year
 (function(){ var y=document.getElementById('yr'); if(y) y.textContent=new Date().getFullYear(); })();
@@ -350,16 +351,13 @@ footer a:hover{color:var(--gold);}
   var f=document.getElementById('capform'); if(!f)return;
   var inp=document.getElementById('capemail'), nameInp=document.getElementById('capname'), msg=document.getElementById('capmsg'), btn=f.querySelector('button');
   function set(t,cls){msg.textContent=t;msg.className='cap-msg '+(cls||'');}
-  f.addEventListener('submit',function(e){
-    e.preventDefault();
-    var email=(inp.value||'').trim();
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){set('Please enter a valid email.','err');inp.focus();return;}
-    btn.disabled=true; set('One moment…','');
-    fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,name:((nameInp&&nameInp.value)||'').trim()})})
-      .then(function(r){return r.json().catch(function(){return {ok:r.ok};});})
-      .then(function(d){ if(d&&d.ok){f.reset();set('You’re on the list. Welcome — Experience the Experience.','ok');} else {set((d&&d.error)||'Something went wrong. Please try again.','err');} })
-      .catch(function(){set('Network error. Please try again.','err');})
-      .finally(function(){btn.disabled=false;});
+  // Protected sign-up: captcha (when configured) + a 6-digit code emailed to the address.
+  DotxCapture.attach(f, {
+    payload: function(){ return {email:(inp.value||'').trim(), name:((nameInp&&nameInp.value)||'').trim(), source:'thedotx.com/about'}; },
+    fail: function(m){ set(m||'', m?'err':''); },
+    busy: function(b){ btn.disabled=b; },
+    hide: function(){ return [inp, nameInp, btn].filter(Boolean); },
+    done: function(){ f.reset(); [inp,nameInp,btn].forEach(function(el){ if(el) el.style.display='none'; }); set('You’re on the list. Welcome — Experience the Experience.','ok'); }
   });
 })();
 // ask-AI buttons
