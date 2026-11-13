@@ -52,6 +52,7 @@ class Profile(models.Model):
     city = models.CharField(max_length=120, blank=True)       # used to match them to a local Dot
     phone = models.CharField(max_length=20, blank=True)       # E.164, e.g. +13105551234
     sms_opt_in = models.BooleanField(default=False)           # explicit consent to text
+    sms_opt_in_at = models.DateTimeField(null=True, blank=True)   # when that consent was given
 
     # Code of Conduct consent (required at signup)
     coc_agreed = models.BooleanField(default=False)

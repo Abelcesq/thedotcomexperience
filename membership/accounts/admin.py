@@ -51,7 +51,7 @@ class ProfileAdmin(admin.ModelAdmin):
                      "stripe_customer_id", "stripe_subscription_id")
     autocomplete_fields = ("reports_to",)
     list_select_related = ("user", "reports_to", "reports_to__user")
-    readonly_fields = ("member_id", "role_since", "stripe_customer_id", "stripe_subscription_id",
+    readonly_fields = ("member_id", "role_since", "sms_opt_in_at", "stripe_customer_id", "stripe_subscription_id",
                        "current_period_end", "price_id", "coc_agreed_at",
                        "created_at", "updated_at")
     fieldsets = (
@@ -61,7 +61,7 @@ class ProfileAdmin(admin.ModelAdmin):
             "description": "Everyone starts as a Member. A Member reports to an Ambassador, an "
                            "Ambassador to a Local Leader, a Local Leader to a Regional.",
         }),
-        ("Contact", {"fields": ("phone", "sms_opt_in")}),
+        ("Contact", {"fields": ("phone", "sms_opt_in", "sms_opt_in_at")}),
         ("Code of Conduct", {"fields": ("coc_agreed", "coc_agreed_at")}),
         ("Membership (Stripe is the source of truth)", {
             "fields": ("membership_status", "current_period_end", "stripe_customer_id",
@@ -71,7 +71,7 @@ class ProfileAdmin(admin.ModelAdmin):
     )
     inlines = [TierChangeInline]
     actions = ["make_ambassador", "make_local_leader", "make_regional", "make_member",
-               "assign_upline", "clear_upline"]
+               "assign_upline", "clear_upline", "send_test_text"]
 
     # --- columns ---------------------------------------------------------------
     @admin.display(description="Name", ordering="display_name")
@@ -164,6 +164,32 @@ class ProfileAdmin(admin.ModelAdmin):
     @admin.action(description="Set tier → Member")
     def make_member(self, request, queryset):
         self._set_tier(request, queryset, R.MEMBER)
+
+    @admin.action(description="Send a test text to selected (opted-in members only)")
+    def send_test_text(self, request, queryset):
+        from sms import reminders, service
+        if not service.is_configured():
+            self.message_user(
+                request, "Texting isn't switched on yet: add the Twilio settings in Heroku first.",
+                level=messages.ERROR)
+            return
+        sent, failed, skipped = 0, [], 0
+        for profile in queryset:
+            entry = reminders.send_test(profile)
+            if entry is None:
+                skipped += 1
+            elif entry.status == "sent":
+                sent += 1
+            else:
+                failed.append(f"{profile.name}: {entry.error}")
+        if sent:
+            self.message_user(request, f"Test text sent to {sent} member(s).")
+        if skipped:
+            self.message_user(
+                request, f"{skipped} skipped: no phone number, or they haven't opted in to texts.",
+                level=messages.WARNING)
+        for line in failed:
+            self.message_user(request, f"Failed — {line}", level=messages.ERROR)
 
     @admin.action(description="Remove selected from their upline")
     def clear_upline(self, request, queryset):

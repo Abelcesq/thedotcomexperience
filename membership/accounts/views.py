@@ -32,7 +32,11 @@ def profile_edit(request):
     if request.method == "POST":
         form = ProfileForm(request.POST, instance=profile)
         if form.is_valid():
-            form.save()
+            saved = form.save()
+            if form.newly_opted_in:
+                # A one-time "you're signed up" text (does nothing until texting is switched on).
+                from sms.reminders import send_confirmation
+                send_confirmation(saved)
             messages.success(request, "Your profile has been updated.")
             return redirect("profile")
     else:

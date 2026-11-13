@@ -77,7 +77,7 @@ class ProfileForm(forms.ModelForm):
             "city": "City",
             "bio": "About you",
             "directory_visible": "Show me in the member directory",
-            "sms_opt_in": "Text me about my Dot",
+            "sms_opt_in": "Text me a reminder before my Dot meets",
         }
         help_texts = {
             "display_name": "The name other members see.",
@@ -85,7 +85,9 @@ class ProfileForm(forms.ModelForm):
             "bio": "A line or two other members will see on your page (300 characters).",
             "directory_visible": "Other members can find your page, see your name, city and tier, and ask "
                                  "to connect. Your email and phone are never shown. Turn this off to stay private.",
-            "sms_opt_in": "We only text if you opt in, and you can reply STOP anytime.",
+            "sms_opt_in": "About one text a week from The Dot Com Experience, sent before your Dot meets. "
+                          "Message and data rates may apply. Reply STOP to cancel or HELP for help. "
+                          "Texts are optional and never a condition of membership.",
         }
         widgets = {
             "city": forms.TextInput(attrs={"placeholder": "e.g. Los Angeles"}),
@@ -98,6 +100,10 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Remembered so save() can tell when someone newly agrees to texts.
+        self._was_opted_in = bool(self.instance.pk and self.instance.sms_opt_in)
+        self._old_phone = self.instance.phone if self.instance.pk else ""
+        self.newly_opted_in = False
         # Show a saved number split back into its country and local parts.
         stored = self.instance.phone if self.instance and self.instance.pk else ""
         if stored:
@@ -132,5 +138,13 @@ class ProfileForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
-        self.instance.phone = self.cleaned_data.get("phone", "")
+        profile = self.instance
+        profile.phone = self.cleaned_data.get("phone", "")
+        if profile.sms_opt_in:
+            # New consent, or consent given for a different number: record when.
+            if not self._was_opted_in or profile.phone != self._old_phone:
+                profile.sms_opt_in_at = timezone.now()
+                self.newly_opted_in = True
+        else:
+            profile.sms_opt_in_at = None
         return super().save(commit=commit)

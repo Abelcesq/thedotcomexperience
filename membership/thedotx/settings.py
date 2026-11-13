@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "dots",
     "billing",
     "community",
+    "sms",
 ]
 
 MIDDLEWARE = [
@@ -147,6 +148,18 @@ TIER_CAPS = {
 COMMUNITY_MAX_REQUESTS_PER_DAY = int(os.environ.get("COMMUNITY_MAX_REQUESTS_PER_DAY", "20"))
 COMMUNITY_MAX_MESSAGES_PER_5_MIN = int(os.environ.get("COMMUNITY_MAX_MESSAGES_PER_5_MIN", "30"))
 COMMUNITY_MESSAGE_MAX_LENGTH = 2000
+
+# --- Text messages (Twilio) -----------------------------------------------
+# Leave these unset and no texts are ever sent. Set the account SID, the auth token,
+# and either a Messaging Service SID (preferred) or a sending number to switch texting on.
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "")
+TWILIO_MESSAGING_SERVICE_SID = os.environ.get("TWILIO_MESSAGING_SERVICE_SID", "")
+TWILIO_FROM_NUMBER = os.environ.get("TWILIO_FROM_NUMBER", "")
+SMS_BRAND = os.environ.get("SMS_BRAND", "The Dot Com Experience")
+SMS_REMINDER_HOURS_BEFORE = float(os.environ.get("SMS_REMINDER_HOURS_BEFORE", "3"))
+SMS_QUIET_START_HOUR = 8     # never text before 8am ...
+SMS_QUIET_END_HOUR = 21      # ... or after 9pm, in the Dot's time zone
 
 # --- Stripe ---------------------------------------------------------------
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")

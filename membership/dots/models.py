@@ -1,5 +1,11 @@
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone as djtz
+
+from . import schedule
 
 
 class Dot(models.Model):
@@ -19,6 +25,10 @@ class Dot(models.Model):
     lng = models.FloatField(null=True, blank=True)
     meeting_night = models.CharField(max_length=20, blank=True)  # e.g. "Tuesday"
     meeting_time = models.CharField(max_length=20, blank=True)   # e.g. "7:00 PM"
+    timezone = models.CharField(
+        max_length=64, default="America/Los_Angeles",
+        help_text="The Dot's local time zone. Reminder texts are timed to it.",
+    )
     ambassador = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, blank=True, related_name="dots_led",
@@ -33,6 +43,40 @@ class Dot(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.city}"
+
+    # --- Schedule (used for reminder texts) ---------------------------------
+    @property
+    def meeting_weekday(self):
+        return schedule.parse_weekday(self.meeting_night)
+
+    @property
+    def meeting_clock(self):
+        return schedule.parse_time(self.meeting_time)
+
+    @property
+    def has_schedule(self):
+        return self.meeting_weekday is not None and self.meeting_clock is not None
+
+    def next_meeting(self, now=None):
+        """The next meeting start (aware, in the Dot's time zone), or None if no schedule is set."""
+        if not self.has_schedule:
+            return None
+        return schedule.next_meeting(self.meeting_weekday, self.meeting_clock,
+                                     self.timezone, now or djtz.now())
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.meeting_night and self.meeting_weekday is None:
+            errors["meeting_night"] = "Enter a day of the week, for example Tuesday."
+        if self.meeting_time and self.meeting_clock is None:
+            errors["meeting_time"] = "Enter a time like 7:00 PM."
+        try:
+            ZoneInfo(self.timezone)
+        except (ZoneInfoNotFoundError, ValueError, TypeError):
+            errors["timezone"] = "Choose a valid time zone, for example America/Los_Angeles."
+        if errors:
+            raise ValidationError(errors)
 
     @property
     def seats_taken(self):

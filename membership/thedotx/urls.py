@@ -16,4 +16,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),        # login, signup, password, etc.
     # Stripe
     path("stripe/", include("billing.urls")),
+    # Text messages: Twilio calls this when a member replies (e.g. STOP)
+    path("sms/", include("sms.urls")),
 ]

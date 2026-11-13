@@ -40,6 +40,10 @@ local-circle finder, the **Request a new Dot location** application, and
   connection requests, private messages, block + report, and a "My team" view
   for Charter holders. Email, phone, and billing are never shown to members.
   Messaging requires a connection or a direct upline/downline link.
+- **Text reminders** (`sms/`): Twilio texts to opted-in, seated members ~3 hours
+  before their Dot meets (quiet hours 8am–9pm, one per member per meeting), an
+  opt-in confirmation, STOP/START handling at `/sms/inbound/`, and a send log.
+  Off until the Twilio config vars are set — see `SMS_SETUP.md`.
 - **Not built (on purpose)**: payouts. Compensation is tracked nowhere yet —
   the Charter plan is pending attorney review.
 - **Admin** (`/admin/`): manage Dots, applications, waitlist, and members;
@@ -103,7 +107,7 @@ waitlist, and the four Stripe webhook transitions with signature verification.
 ## Tests
 
 ```bash
-DJANGO_DEBUG=true python manage.py test accounts community
+DJANGO_DEBUG=true python manage.py test accounts community sms
 ```
 
 ## Still to do before launch (honest list)

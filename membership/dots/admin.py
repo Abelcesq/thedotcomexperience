@@ -1,7 +1,22 @@
+from zoneinfo import available_timezones
+
+from django import forms
+from django.conf import settings
 from django.contrib import admin, messages
+from django.utils import timezone as djtz
 
 from .geocode import geocode_city
 from .models import Dot, DotApplication, DotMembership, Waitlist
+from .schedule import reminder_time
+
+COMMON_ZONES = ["America/Los_Angeles", "America/Denver", "America/Phoenix", "America/Chicago",
+                "America/New_York", "America/Anchorage", "Pacific/Honolulu"]
+
+
+def _timezone_choices():
+    rest = sorted(z for z in available_timezones() if "/" in z and not z.startswith(("Etc/", "posix/", "right/"))
+                  and z not in COMMON_ZONES)
+    return [(z, z.replace("_", " ")) for z in COMMON_ZONES + rest]
 
 
 class DotMembershipInline(admin.TabularInline):
@@ -13,7 +28,7 @@ class DotMembershipInline(admin.TabularInline):
 @admin.register(Dot)
 class DotAdmin(admin.ModelAdmin):
     list_display = ("name", "city", "status", "has_coords", "meeting_night", "meeting_time",
-                    "ambassador", "seats_taken", "capacity")
+                    "next_reminder", "ambassador", "seats_taken", "capacity")
     list_filter = ("status", "city")
     search_fields = ("name", "city", "region", "location")
     autocomplete_fields = ("ambassador",)
@@ -26,8 +41,31 @@ class DotAdmin(admin.ModelAdmin):
             "description": "Leave blank and we'll look them up from the city when you save. "
                            "Fill them in to set an exact spot.",
         }),
-        ("Meeting & people", {"fields": ("meeting_night", "meeting_time", "ambassador", "capacity")}),
+        ("Meeting & people", {
+            "fields": ("meeting_night", "meeting_time", "timezone", "ambassador", "capacity"),
+            "description": "Enter the day (for example Tuesday) and start time (for example 7:00 PM). "
+                           "Members with a seat here who opted in to texts get a reminder before each meeting.",
+        }),
     )
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "timezone":
+            return forms.ChoiceField(choices=_timezone_choices(), initial="America/Los_Angeles",
+                                     label="Time zone", help_text=db_field.help_text)
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+
+    @admin.display(description="Next reminder text")
+    def next_reminder(self, obj):
+        if obj.status == Dot.Status.PAUSED:
+            return "Paused"
+        start = obj.next_meeting()
+        if not start:
+            return "No meeting day/time set"
+        send_at = reminder_time(start, settings.SMS_REMINDER_HOURS_BEFORE,
+                                settings.SMS_QUIET_START_HOUR, settings.SMS_QUIET_END_HOUR)
+        if send_at <= djtz.now().astimezone(start.tzinfo):
+            return "Sending now for " + start.strftime("%a %b %-d")
+        return send_at.strftime("%a %b %-d, %-I:%M %p %Z")
 
     @admin.display(boolean=True, description="On map")
     def has_coords(self, obj):
