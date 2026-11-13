@@ -10,6 +10,7 @@ def membership_flags(request):
         "MEMBERSHIP_PRICE_LABEL": settings.MEMBERSHIP_PRICE_LABEL,
         "STRIPE_CONFIGURED": bool(settings.STRIPE_SECRET_KEY and settings.STRIPE_PRICE_ID),
         "my_profile": profile,
-        # Only handed to templates when the captcha is switched on (secret key present).
-        "RECAPTCHA_SITE_KEY": settings.RECAPTCHA_SITE_KEY if settings.RECAPTCHA_SECRET_KEY else "",
+        # Only handed to templates when the captcha is switched on (both keys present).
+        "RECAPTCHA_SITE_KEY": (settings.RECAPTCHA_SITE_KEY
+                               if settings.RECAPTCHA_SITE_KEY and settings.RECAPTCHA_SECRET_KEY else ""),
     }

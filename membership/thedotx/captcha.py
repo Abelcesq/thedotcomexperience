@@ -1,4 +1,4 @@
-"""Google reCAPTCHA v3 for the public forms. Invisible to visitors; off until the secret key is set."""
+"""Google reCAPTCHA "I'm not a robot" checkbox for the public forms. Off until both keys are set."""
 import json
 import logging
 import urllib.error
@@ -9,9 +9,8 @@ from django import forms
 from django.conf import settings
 
 log = logging.getLogger(__name__)
-FIELD = "g-recaptcha-response"           # the hidden field the page fills in before submitting
-MESSAGE = ("We couldn’t confirm you’re not a robot. Please try again — if you use an ad or "
-           "tracker blocker, switch it off for this page.")
+FIELD = "g-recaptcha-response"           # the field Google's checkbox adds to the form
+MESSAGE = "Please tick the \u201cI\u2019m not a robot\u201d box and try again."
 
 
 def enabled():
@@ -27,7 +26,9 @@ def _ask_google(token):
 
 
 def passes(token, action=None):
-    """True if Google says the visitor looks human (score at or above RECAPTCHA_MIN_SCORE).
+    """True if Google confirms the visitor ticked the box and passed its check.
+
+    (With a score-based v3 key, the score must also be at or above RECAPTCHA_MIN_SCORE.)
 
     If Google can't be reached we let the visitor through (the other protections still
     apply) rather than lock every real person out.
@@ -50,7 +51,7 @@ def passes(token, action=None):
 
 
 class CaptchaFormMixin:
-    """Add to a form to require the reCAPTCHA check whenever the secret key is configured."""
+    """Add to a form to require the reCAPTCHA checkbox whenever both keys are configured."""
 
     captcha_action = None                 # set on the form to tie tokens to it, e.g. "signup"
 

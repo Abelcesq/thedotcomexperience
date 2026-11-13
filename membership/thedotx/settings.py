@@ -150,12 +150,12 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = "The Dot Com Experience: "
 MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
 MFA_TOTP_ISSUER = "The Dot Com Experience"
 
-# Google reCAPTCHA v3 (invisible) on signup and the Dot forms. Switched on by setting
-# RECAPTCHA_SECRET_KEY in the config vars. The site key is public by design; the secret
-# key must never be written into code.
-RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "6LdAoh0uAAAAACSjYQ07yEgFaDhccnbfjlBddTGd")
+# Google reCAPTCHA "I'm not a robot" checkbox (v2) on signup and the Dot forms. It appears
+# once BOTH keys of a v2 "Checkbox" key pair are set in the config vars. The secret key
+# must never be written into code.
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
-RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))
+RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))   # only used by score-based (v3) keys
 
 LOGIN_REDIRECT_URL = "/accounts/profile/"
 LOGOUT_REDIRECT_URL = "/"

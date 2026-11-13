@@ -8,29 +8,45 @@ they switch on. Config vars live in Heroku → the app → Settings → Reveal C
 | Protection | Home site form (`thadotx`) | Member signup + Dot forms (`thedotx-members`) | Switches on when |
 | --- | --- | --- | --- |
 | Emailed 6-digit code | Yes | Yes (signup) | Home: already on. Members: `RESEND_API_KEY` is set |
-| Google reCAPTCHA v3 (invisible) | Yes | Yes | `RECAPTCHA_SECRET_KEY` is set on that app |
+| Google reCAPTCHA “I’m not a robot” checkbox | Yes | Yes | Both `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY` are set on that app |
 | Hidden bot-trap field | Yes | Yes | Always on |
 | Rate limits | Yes | Yes (built into sign-in) | Always on |
 | Two-step verification (Google Authenticator) | — | Offered to every member | Always available; needs a confirmed email |
 
-## Config vars to add
+## Step 1 — Create a checkbox key at Google
+
+The checkbox needs a reCAPTCHA **v2 “I’m not a robot” Checkbox** key. A v3 key (the
+invisible, score-based kind) will not work for it: keys are tied to their type.
+
+1. Go to google.com/recaptcha/admin and press **+** (Create).
+2. Label: `the dot checkbox`. Type: **Challenge (v2)** → **“I’m not a robot” Checkbox**.
+3. Domains: `www.thedotx.com`, `members.thedotx.com`, `www.thedotcomexperience.com`.
+4. Submit, then copy the **site key** and the **secret key**.
+
+## Step 2 — Config vars to add
+
+Add the same two reCAPTCHA values to both apps.
 
 **App `thadotx` (home site)**
 
 | Key | Value |
 | --- | --- |
-| `RECAPTCHA_SECRET_KEY` | The *secret key* from the Google reCAPTCHA admin page |
+| `RECAPTCHA_SITE_KEY` | The v2 *site key* |
+| `RECAPTCHA_SECRET_KEY` | The v2 *secret key* |
 
 **App `thedotx-members` (member site)**
 
 | Key | Value |
 | --- | --- |
-| `RECAPTCHA_SECRET_KEY` | The same secret key |
+| `RECAPTCHA_SITE_KEY` | The v2 *site key* |
+| `RECAPTCHA_SECRET_KEY` | The v2 *secret key* |
 | `RESEND_API_KEY` | Copy the value of `RESEND_API_KEY` from the `thadotx` app |
 | `DEFAULT_FROM_EMAIL` | Optional. Only if `thadotx` has a `WELCOME_FROM` value: copy it here so both sites send from the same address |
 
-The reCAPTCHA *site* key is public and already in the code. The *secret* key must only
-ever be in config vars.
+The two reCAPTCHA keys must come from the same key pair. A site key paired with a secret
+key from a different key (for example the earlier v3 one) makes every sign-up fail the
+check. The checkbox appears only when both are set; with either missing, the forms work
+without it. The secret key must only ever be in config vars.
 
 ## What changes for members once `RESEND_API_KEY` is set
 
@@ -53,8 +69,8 @@ delete that member's entries. They can then sign in with their password and set 
 
 - Allowed domains at Google must include every address the forms are served from:
   `www.thedotx.com`, `members.thedotx.com`, `www.thedotcomexperience.com`.
-- v3 has no checkbox. Google scores each visitor from 0.0 (bot) to 1.0 (human) and the site
-  requires 0.5. If real people are being refused, lower it with `RECAPTCHA_MIN_SCORE`
-  (for example `0.3`) on that app.
+- Most people just tick the box. Google sometimes follows it with a picture puzzle.
+- If a visitor's ad or tracker blocker stops the checkbox from loading, the form tells them
+  to switch it off for the page and reload.
 - The form on abelcalderon.com has no reCAPTCHA yet, so the home site lets that one origin
   through without it (it still needs the emailed code).

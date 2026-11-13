@@ -1,21 +1,7 @@
-{# Google reCAPTCHA v3: invisible. Fetches a token when the form is submitted, then submits. #}
+{# Google reCAPTCHA "I'm not a robot" checkbox. Shown only when both keys are configured. #}
 {% if RECAPTCHA_SITE_KEY %}
-<input type="hidden" name="g-recaptcha-response" value="">
-<script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}"></script>
-<script>
-(function(){
-  var form = document.currentScript.closest('form'); if(!form) return;
-  var field = form.querySelector('input[name="g-recaptcha-response"]'), ready = false;
-  form.addEventListener('submit', function(e){
-    if(ready || typeof grecaptcha === 'undefined') return;      // already have a token, or Google's script was blocked
-    e.preventDefault();
-    var button = form.querySelector('button[type=submit]'); if(button) button.disabled = true;
-    var go = function(token){ if(ready) return; ready = true; field.value = token || ''; form.submit(); };
-    setTimeout(function(){ go(''); }, 8000);
-    grecaptcha.ready(function(){
-      grecaptcha.execute('{{ RECAPTCHA_SITE_KEY }}', {action: '{{ action|default:"submit" }}'}).then(go, function(){ go(''); });
-    });
-  });
-})();
-</script>
+<div class="formrow captcha">
+  <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" data-theme="dark"></div>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</div>
 {% endif %}

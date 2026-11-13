@@ -1,4 +1,4 @@
-/* Sign-up forms: bot trap, Google reCAPTCHA v3 (invisible), and the emailed 6-digit code step.
+/* Sign-up forms: bot trap, Google reCAPTCHA “I’m not a robot” checkbox, and the emailed 6-digit code step.
    Usage: DotxCapture.attach(formElement, { payload, fail, busy, hide, done }) */
 (function () {
   'use strict';
@@ -13,36 +13,22 @@
     return configPromise;
   }
 
-  // Loads Google's script once and resolves with a function that fetches a fresh token.
-  function loadRecaptcha(siteKey) {
+  // Loads Google's script once; resolves with grecaptcha (or null if the browser blocked it).
+  function loadRecaptcha() {
     if (!recaptchaPromise) {
       recaptchaPromise = new Promise(function (resolve) {
         var s = document.createElement('script');
-        s.src = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(siteKey);
+        s.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
         s.async = true;
-        s.onload = function () { resolve(window.grecaptcha || null); };
+        s.onload = function () {
+          if (!window.grecaptcha) { resolve(null); return; }
+          window.grecaptcha.ready(function () { resolve(window.grecaptcha); });
+        };
         s.onerror = function () { resolve(null); };
         document.head.appendChild(s);
       });
     }
     return recaptchaPromise;
-  }
-
-  // A token for this one submission ('' if reCAPTCHA is off or blocked by the browser).
-  function captchaToken() {
-    return getConfig().then(function (cfg) {
-      if (!cfg || !cfg.recaptchaSiteKey) return '';
-      return loadRecaptcha(cfg.recaptchaSiteKey).then(function (g) {
-        if (!g) return '';
-        return new Promise(function (resolve) {
-          var done = false, finish = function (t) { if (!done) { done = true; resolve(t || ''); } };
-          setTimeout(function () { finish(''); }, 8000);
-          g.ready(function () {
-            g.execute(cfg.recaptchaSiteKey, { action: 'subscribe' }).then(finish, function () { finish(''); });
-          });
-        });
-      });
-    });
   }
 
   function addStyles() {
@@ -51,6 +37,7 @@
     css.id = 'dotx-capture-css';
     css.textContent =
       '.dx-trap{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}' +
+      '.dx-captcha{flex-basis:100%;grid-column:1/-1;margin:4px 0;max-width:100%;overflow:hidden}' +
       '.dx-verify{flex-basis:100%;grid-column:1/-1;text-align:left}' +
       '.dx-verify p{margin:0 0 12px}' +
       '.dx-verify .dx-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}' +
@@ -83,12 +70,28 @@
     trap.innerHTML = '<label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label>';
     form.appendChild(trap);
 
-    // Warm up reCAPTCHA so the first submit is quick (it is invisible; there is nothing to click).
-    getConfig().then(function (cfg) { if (cfg && cfg.recaptchaSiteKey) loadRecaptcha(cfg.recaptchaSiteKey); });
+    // The "I'm not a robot" checkbox (shown only when the site has reCAPTCHA keys).
+    var captchaOn = false, g = null, widgetId = null;
+    var captchaBox = document.createElement('div');
+    captchaBox.className = 'dx-captcha';
+    var anchor = opts.captchaBefore || (submitBtn && submitBtn.parentNode !== form ? submitBtn.parentNode : submitBtn);
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(captchaBox, anchor); else form.appendChild(captchaBox);
+    getConfig().then(function (cfg) {
+      if (!cfg || !cfg.recaptchaSiteKey) return;
+      captchaOn = true;
+      loadRecaptcha().then(function (lib) {
+        if (!lib) return;
+        g = lib;
+        widgetId = g.render(captchaBox, { sitekey: cfg.recaptchaSiteKey, theme: 'dark' });
+      });
+    });
+    function captchaAnswer() { return g && widgetId !== null ? g.getResponse(widgetId) : ''; }
+    function captchaReset() { if (g && widgetId !== null) g.reset(widgetId); }
 
     var panel = null, token = null, sentTo = '';
 
     function showVerify() {
+      captchaBox.style.display = 'none';
       (opts.hide ? opts.hide() : []).forEach(function (el) { el.setAttribute('data-dx-hidden', el.style.display || ''); el.style.display = 'none'; });
       if (!panel) {
         panel = document.createElement('div');
@@ -122,7 +125,7 @@
     function goBack() {
       panel.style.display = 'none';
       form.querySelectorAll('[data-dx-hidden]').forEach(function (el) { el.style.display = el.getAttribute('data-dx-hidden'); el.removeAttribute('data-dx-hidden'); });
-      busy(false); token = null;
+      captchaBox.style.display = ''; captchaReset(); busy(false); token = null;
     }
 
     function confirmCode() {
@@ -148,16 +151,19 @@
       e.preventDefault();
       var data = opts.payload();
       if (!EMAIL_RE.test(data.email || '')) { fail('Please enter a valid email.'); return; }
+      if (captchaOn && !g) {
+        fail('The “I’m not a robot” check couldn’t load. Please switch off any ad or tracker blocker for this page and reload.');
+        return;
+      }
+      if (captchaOn && g && !captchaAnswer()) { fail('Please tick the “I’m not a robot” box.'); return; }
       data.website = (form.querySelector('input[name=website]') || {}).value || '';
+      data.captcha = captchaAnswer();
       busy(true); fail('');
-      captchaToken().then(function (captcha) {
-        data.captcha = captcha;
-        return post('/api/subscribe', data);
-      }).then(function (d) {
+      post('/api/subscribe', data).then(function (d) {
         if (d && d.ok && d.verify && d.token) { token = d.token; sentTo = data.email; showVerify(); }
         else if (d && d.ok) { opts.done && opts.done({ ok: true, intent: data.intent || '' }); }
-        else { fail((d && d.error) || 'Something went wrong. Please try again.'); busy(false); }
-      }).catch(function () { fail('Network error. Please try again.'); busy(false); });
+        else { fail((d && d.error) || 'Something went wrong. Please try again.'); captchaReset(); busy(false); }
+      }).catch(function () { fail('Network error. Please try again.'); captchaReset(); busy(false); });
     });
   }
 

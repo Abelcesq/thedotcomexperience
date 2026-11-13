@@ -18,8 +18,8 @@ User = get_user_model()
 PASSWORD = "correct-horse-battery-9"
 VERIFY = dict(ACCOUNT_EMAIL_VERIFICATION="mandatory", ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED=True)
 CAPTCHA = dict(RECAPTCHA_SITE_KEY="site", RECAPTCHA_SECRET_KEY="secret", RECAPTCHA_MIN_SCORE=0.5)
-HUMAN = {"success": True, "score": 0.9}
-ROBOT = {"success": True, "score": 0.1}
+HUMAN = {"success": True}            # Google confirmed the ticked box
+ROBOT = {"success": False, "error-codes": ["invalid-input-response"]}
 
 
 def signup_data(email="ana@example.com", **extra):
@@ -81,21 +81,25 @@ class EmailCodeSignupTests(Base):
 
 @override_settings(**CAPTCHA)
 class CaptchaTests(Base):
-    def test_signup_needs_a_human_looking_recaptcha_answer(self):
+    def test_signup_needs_the_not_a_robot_box_ticked(self):
         url = reverse("account_signup")
-        self.assertContains(self.client.get(url), "recaptcha/api.js?render=site")
+        page = self.client.get(url)
+        self.assertContains(page, 'class="g-recaptcha" data-sitekey="site"')
+        self.assertContains(page, "https://www.google.com/recaptcha/api.js")
         with patch("thedotx.captcha._ask_google", return_value=HUMAN) as google:
-            self.assertContains(self.client.post(url, signup_data()), "confirm you’re not a robot")   # no token sent
+            self.assertContains(self.client.post(url, signup_data()), "Please tick the")      # box not ticked
             google.assert_not_called()
         with patch("thedotx.captcha._ask_google", return_value=ROBOT):
             self.client.post(url, signup_data(**{"g-recaptcha-response": "tok"}))
         self.assertFalse(User.objects.filter(email="ana@example.com").exists())
-        with patch("thedotx.captcha._ask_google", return_value={"success": True, "score": 0.9, "action": "waitlist"}):
-            self.client.post(url, signup_data(**{"g-recaptcha-response": "tok"}))     # token from another form
-        self.assertFalse(User.objects.filter(email="ana@example.com").exists())
-        with patch("thedotx.captcha._ask_google", return_value={"success": True, "score": 0.9, "action": "signup"}):
+        with patch("thedotx.captcha._ask_google", return_value=HUMAN):
             self.client.post(url, signup_data(**{"g-recaptcha-response": "tok"}))
         self.assertTrue(User.objects.filter(email="ana@example.com").exists())
+
+    def test_a_score_based_key_still_works_if_one_is_ever_used(self):
+        with patch("thedotx.captcha._ask_google", return_value={"success": True, "score": 0.1}):
+            self.client.post(reverse("account_signup"), signup_data(**{"g-recaptcha-response": "tok"}))
+        self.assertFalse(User.objects.filter(email="ana@example.com").exists())
 
     def test_if_google_is_unreachable_real_people_are_not_locked_out(self):
         with patch("thedotx.captcha._ask_google", side_effect=OSError("down")):
@@ -118,7 +122,9 @@ class CaptchaTests(Base):
             self.client.post(reverse("request_dot"), {**apply, "g-recaptcha-response": "tok"})
             self.assertEqual(DotApplication.objects.count(), 1)
 
-    def test_forms_show_no_recaptcha_until_the_secret_key_is_set(self):
+    def test_forms_show_no_recaptcha_until_both_keys_are_set(self):
+        with self.settings(RECAPTCHA_SITE_KEY=""):
+            self.assertNotContains(self.client.get(reverse("account_signup")), "recaptcha")
         with self.settings(RECAPTCHA_SECRET_KEY=""):
             self.assertNotContains(self.client.get(reverse("account_signup")), "recaptcha")
             self.client.post(reverse("account_signup"), signup_data())

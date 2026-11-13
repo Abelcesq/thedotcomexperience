@@ -216,3 +216,4 @@ main.shell > p,main.shell > ul{max-width:520px;margin-inline:auto}
 .secure-row:last-of-type{border-bottom:none}
 .pill.on{color:#8fe3bf;border-color:rgba(143,227,191,.4)}
 .pill.off{color:#f0c674;border-color:rgba(240,198,116,.4)}
+.captcha{min-height:78px;max-width:100%;overflow:hidden}

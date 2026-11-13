@@ -1,4 +1,4 @@
-// Protection for the public sign-up form: email verification codes, rate limits, captcha (Google reCAPTCHA v3).
+// Protection for the public sign-up form: email verification codes, rate limits, captcha (Google reCAPTCHA).
 //
 // Verification is stateless. When someone asks to join, we email them a 6-digit code and
 // hand the browser a signed token carrying their details. The code is never stored: the
@@ -100,10 +100,10 @@ function createGuard(options) {
 }
 
 /**
- * Ask Google reCAPTCHA (v3) whether a visitor looks human.
- * v3 is invisible: Google returns a score from 0.0 (bot) to 1.0 (human) and we require a
- * minimum. Returns true/false. If Google itself can't be reached we let the request
- * through, because the emailed code still stands between a bot and the list.
+ * Ask Google reCAPTCHA whether the visitor's "I'm not a robot" answer is genuine.
+ * Returns true/false. (If a score is present, as with invisible v3 keys, it must also meet
+ * the minimum.) If Google itself can't be reached we let the request through, because the
+ * emailed code still stands between a bot and the list.
  */
 async function captchaPasses(secretKey, responseToken, ip, options) {
   const opts = options || {};

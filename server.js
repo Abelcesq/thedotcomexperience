@@ -227,12 +227,11 @@ async function postWebhook(email, name) {
 // Bots were posting made-up addresses here, and each one triggered a welcome email, a
 // list entry and an admin notification. Now a sign-up only counts once the person has
 // typed the 6-digit code we email them. In front of that: a hidden-field bot trap, an
-// Google reCAPTCHA v3 check (invisible to visitors), and rate limits.
+// Google reCAPTCHA “I’m not a robot” checkbox (v2), and rate limits.
 //
 // Config vars (all optional):
-//   RECAPTCHA_SECRET_KEY — switches the captcha on. Keep it secret: config vars only, never in code.
-//   RECAPTCHA_SITE_KEY — the public half (defaults to this site's key below).
-//   RECAPTCHA_MIN_SCORE — how human a visitor must look, 0.0–1.0 (default 0.5).
+//   RECAPTCHA_SITE_KEY + RECAPTCHA_SECRET_KEY — a reCAPTCHA v2 “Checkbox” key pair. Both must be
+//       set for the checkbox to appear. Keep the secret key in config vars only, never in code.
 //   CAPTCHA_EXEMPT_ORIGINS — sites allowed to post without a captcha (default: abelcalderon.com,
 //       whose form has no reCAPTCHA yet). Remove the exemption once that form has one.
 //   SUBSCRIBE_SECRET — signing key for verification tokens (defaults to one derived from RESEND_API_KEY).
@@ -249,9 +248,8 @@ const SITE_BASE_URL = (process.env.SITE_BASE_URL || 'https://www.thedotx.com').r
 const CAPTCHA_EXEMPT_ORIGINS = new Set((process.env.CAPTCHA_EXEMPT_ORIGINS
   || 'https://www.abelcalderon.com,https://abelcalderon.com').split(',').map((o) => o.trim()).filter(Boolean));
 
-const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || '6LdAoh0uAAAAACSjYQ07yEgFaDhccnbfjlBddTGd';   // public by design
-const RECAPTCHA_MIN_SCORE = parseFloat(process.env.RECAPTCHA_MIN_SCORE || '0.5');
-function captchaOn() { return !!process.env.RECAPTCHA_SECRET_KEY; }
+const RECAPTCHA_SITE_KEY = process.env.RECAPTCHA_SITE_KEY || '';
+function captchaOn() { return !!(RECAPTCHA_SITE_KEY && process.env.RECAPTCHA_SECRET_KEY); }
 
 const MINUTE = 60 * 1000;
 function verificationEnabled() {
@@ -325,11 +323,10 @@ app.post('/api/subscribe', async (req, res) => {
     return res.status(429).json({ ok: false, error: 'Too many attempts. Please wait a few minutes and try again.' });
   }
   if (captchaOn() && !CAPTCHA_EXEMPT_ORIGINS.has(req.headers.origin || '')) {
-    const human = await captchaPasses(process.env.RECAPTCHA_SECRET_KEY, body.captcha, clientIp(req),
-      { minScore: RECAPTCHA_MIN_SCORE, action: 'subscribe' });
+    const human = await captchaPasses(process.env.RECAPTCHA_SECRET_KEY, body.captcha, clientIp(req));
     if (!human) {
       return res.status(400).json({ ok: false, captcha: true,
-        error: 'We couldn’t confirm you’re not a robot. Please try again — if you use an ad or tracker blocker, switch it off for this page.' });
+        error: 'Please tick the “I’m not a robot” box and try again.' });
     }
   }
   const details = { e: email, n: name, s: source, c: city, i: intent };
