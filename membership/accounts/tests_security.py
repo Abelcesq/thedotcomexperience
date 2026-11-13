@@ -101,6 +101,30 @@ class CaptchaTests(Base):
             self.client.post(reverse("account_signup"), signup_data(**{"g-recaptcha-response": "tok"}))
         self.assertFalse(User.objects.filter(email="ana@example.com").exists())
 
+    def test_login_needs_the_box_ticked_before_the_password_is_even_checked(self):
+        User.objects.create_user(username="ana@example.com", email="ana@example.com", password=PASSWORD)
+        url = reverse("account_login")
+        self.assertContains(self.client.get(url), 'class="g-recaptcha" data-sitekey="site"')
+        right = {"login": "ana@example.com", "password": PASSWORD}
+        wrong = {"login": "ana@example.com", "password": "not-the-password"}
+        with patch("thedotx.captcha._ask_google", return_value=HUMAN) as google:
+            # Box not ticked: refused the same way whether the password is right or wrong,
+            # so the page gives a script nothing to learn.
+            for attempt in (right, wrong):
+                page = self.client.post(url, attempt)
+                self.assertContains(page, "Please tick the")
+                self.assertNotContains(page, "not correct")
+            google.assert_not_called()
+        self.assertNotIn("_auth_user_id", self.client.session)
+        with patch("thedotx.captcha._ask_google", return_value=ROBOT):
+            self.client.post(url, {**right, "g-recaptcha-response": "tok"})
+        self.assertNotIn("_auth_user_id", self.client.session)
+        with patch("thedotx.captcha._ask_google", return_value=HUMAN):
+            self.assertContains(self.client.post(url, {**wrong, "g-recaptcha-response": "tok"}), "not correct")
+            cache.clear()
+            self.client.post(url, {**right, "g-recaptcha-response": "tok"})
+        self.assertIn("_auth_user_id", self.client.session)
+
     def test_if_google_is_unreachable_real_people_are_not_locked_out(self):
         with patch("thedotx.captcha._ask_google", side_effect=OSError("down")):
             self.client.post(reverse("account_signup"), signup_data(**{"g-recaptcha-response": "tok"}))

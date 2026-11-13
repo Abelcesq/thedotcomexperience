@@ -1,8 +1,9 @@
 import phonenumbers
-from allauth.account.forms import SignupForm
+from allauth.account.forms import LoginForm, SignupForm
 from django import forms
 from django.utils import timezone
 
+from thedotx import captcha
 from thedotx.captcha import CaptchaFormMixin
 
 from .countries import COUNTRIES, PREFERRED
@@ -24,6 +25,19 @@ COC_LABEL = (
     '<a href="https://www.thedotx.com/terms#conduct" target="_blank" rel="noopener">Code of Conduct</a>, '
     "including that membership fees are forfeited if I am removed for a violation."
 )
+
+
+class DotxLoginForm(LoginForm):
+    """The sign-in form, with the "I'm not a robot" checkbox when reCAPTCHA is configured."""
+
+    captcha_action = "login"
+
+    def clean(self):
+        # Check the box BEFORE looking at the password, so a script cannot use this page
+        # to test stolen passwords without solving the check each time.
+        if captcha.enabled() and not captcha.passes(self.data.get(captcha.FIELD, ""), self.captcha_action):
+            self.add_error(None, captcha.MESSAGE)
+        return super().clean()
 
 
 class DotxSignupForm(CaptchaFormMixin, SignupForm):

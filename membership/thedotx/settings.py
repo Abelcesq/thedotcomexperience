@@ -141,7 +141,7 @@ ACCOUNT_EMAIL_VERIFICATION = os.environ.get(
 ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = ACCOUNT_EMAIL_VERIFICATION == "mandatory"
 ALLAUTH_USER_CODE_FORMAT = {"numeric": True, "dashed": False, "length": 6}
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_FORMS = {"signup": "accounts.forms.DotxSignupForm"}
+ACCOUNT_FORMS = {"signup": "accounts.forms.DotxSignupForm", "login": "accounts.forms.DotxLoginForm"}
 ACCOUNT_ADAPTER = "accounts.adapter.DotxAccountAdapter"
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "website"     # hidden bot trap on the signup form
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "The Dot Com Experience: "

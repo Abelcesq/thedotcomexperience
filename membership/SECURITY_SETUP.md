@@ -5,7 +5,7 @@ they switch on. Config vars live in Heroku → the app → Settings → Reveal C
 
 ## What protects what
 
-| Protection | Home site form (`thadotx`) | Member signup + Dot forms (`thedotx-members`) | Switches on when |
+| Protection | Home site form (`thadotx`) | Member signup, login + Dot forms (`thedotx-members`) | Switches on when |
 | --- | --- | --- | --- |
 | Emailed 6-digit code | Yes | Yes (signup) | Home: already on. Members: `RESEND_API_KEY` is set |
 | Google reCAPTCHA “I’m not a robot” checkbox | Yes | Yes | Both `RECAPTCHA_SITE_KEY` and `RECAPTCHA_SECRET_KEY` are set on that app |
@@ -66,6 +66,9 @@ If a member is locked out (lost phone and backup codes): Admin → MFA → Authe
 delete that member's entries. They can then sign in with their password and set it up again.
 
 ## reCAPTCHA notes
+
+- On the login page the checkbox is checked before the password is looked at, so the page
+  cannot be used to test stolen passwords. The Django admin sign-in at `/admin/` has no checkbox.
 
 - Allowed domains at Google must include every address the forms are served from:
   `www.thedotx.com`, `members.thedotx.com`, `www.thedotcomexperience.com`.

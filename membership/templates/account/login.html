@@ -10,12 +10,20 @@
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="errorlist">{{ form.non_field_errors }}</div>{% endif %}
     {% for field in form.visible_fields %}
-      <div class="field formrow">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {{ field.errors }}
-      </div>
+      {% if field.name == 'remember' %}
+        <div class="formrow">
+          <label class="checkbox">{{ field }} <span>Keep me signed in on this device</span></label>
+          {{ field.errors }}
+        </div>
+      {% else %}
+        <div class="field formrow">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endif %}
     {% endfor %}
+    {% include "_captcha.html" with action="login" %}
     {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
     <div class="submit">
       <button class="btn" type="submit">Log in</button>
