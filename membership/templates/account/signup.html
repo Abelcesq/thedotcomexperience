@@ -11,7 +11,8 @@
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="errorlist">{{ form.non_field_errors }}</div>{% endif %}
     {% for field in form.visible_fields %}
-      {% if field.name == 'coc_agreed' %}
+      {% if field.name == 'website' %}{{ field }}
+      {% elif field.name == 'coc_agreed' %}
         <div class="formrow">
           <label class="checkbox">{{ field }} <span>{{ field.label|safe }}</span></label>
           {{ field.errors }}
@@ -24,6 +25,7 @@
         </div>
       {% endif %}
     {% endfor %}
+    {% include "_captcha.html" with action="signup" %}
     {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
     <div class="submit"><button class="btn" type="submit">Create account</button></div>
   </form>

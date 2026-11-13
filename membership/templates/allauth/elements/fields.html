@@ -1,0 +1,19 @@
+{# Render every form field with the site's own field styling. #}
+{% for field in attrs.form.hidden_fields %}{{ field }}{% endfor %}
+{% if attrs.form.non_field_errors %}<div class="errorlist">{{ attrs.form.non_field_errors }}</div>{% endif %}
+{% for field in attrs.form.visible_fields %}
+  {% if field.field.widget.input_type == "checkbox" %}
+    <div class="formrow">
+      <label class="checkbox">{{ field }} <span>{{ field.label }}</span></label>
+      {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+      {{ field.errors }}
+    </div>
+  {% else %}
+    <div class="field formrow">
+      {% if field.label %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% endif %}
+      {{ field }}
+      {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+      {{ field.errors }}
+    </div>
+  {% endif %}
+{% endfor %}

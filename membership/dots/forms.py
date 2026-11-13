@@ -1,5 +1,7 @@
 from django import forms
 
+from thedotx.captcha import BotTrapMixin, CaptchaFormMixin
+
 from .models import DotApplication, Waitlist
 
 
@@ -10,7 +12,9 @@ class DotFinderForm(forms.Form):
     )
 
 
-class WaitlistForm(forms.ModelForm):
+class WaitlistForm(BotTrapMixin, CaptchaFormMixin, forms.ModelForm):
+    captcha_action = "waitlist"
+
     class Meta:
         model = Waitlist
         fields = ["first_name", "email", "city", "intent"]
@@ -22,7 +26,9 @@ class WaitlistForm(forms.ModelForm):
         }
 
 
-class DotApplicationForm(forms.ModelForm):
+class DotApplicationForm(BotTrapMixin, CaptchaFormMixin, forms.ModelForm):
+    captcha_action = "dot_request"
+
     agree = forms.BooleanField(
         required=True,
         label="I understand chartering a Dot is an application and training process, "

@@ -18,6 +18,7 @@
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="errorlist">{{ form.non_field_errors }}</div>{% endif %}
     {% for field in form %}
+      {% if field.name == 'website' %}{{ field }}{% else %}
       {% if field.name == 'agree' %}
         <div class="formrow"><label class="checkbox">{{ field }} <span>{{ field.label }}</span></label>{{ field.errors }}</div>
       {% else %}
@@ -28,7 +29,9 @@
           {{ field.errors }}
         </div>
       {% endif %}
+    {% endif %}
     {% endfor %}
+    {% include "_captcha.html" with action="dot_request" %}
     <div class="submit"><button class="btn" type="submit">Submit application</button></div>
   </form>
 </div>

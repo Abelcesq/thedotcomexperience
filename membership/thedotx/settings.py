@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Auth (allauth)
     "allauth",
     "allauth.account",
+    "allauth.mfa",          # two-step verification (authenticator apps)
     # Our apps
     "accounts",
     "dots",
@@ -111,20 +112,13 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-# allauth: email-based login, verification on in prod
-ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get("ACCOUNT_EMAIL_VERIFICATION", "optional")
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_FORMS = {"signup": "accounts.forms.DotxSignupForm"}
-ACCOUNT_ADAPTER = "accounts.adapter.DotxAccountAdapter"
-
-LOGIN_REDIRECT_URL = "/accounts/profile/"
-LOGOUT_REDIRECT_URL = "/"
-LOGIN_URL = "/accounts/login/"
-
-# Email: console in dev; set EMAIL_* / RESEND for prod (or reuse the Node funnel).
-if env_bool("USE_SMTP", False):
+# --- Email ----------------------------------------------------------------
+# Set RESEND_API_KEY (the same Resend account the home site uses) to send real email:
+# verification codes and password resets. Without it, email only prints to the log.
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+if RESEND_API_KEY:
+    EMAIL_BACKEND = "thedotx.email.ResendEmailBackend"
+elif env_bool("USE_SMTP", False):
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
     EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
@@ -133,7 +127,39 @@ if env_bool("USE_SMTP", False):
     EMAIL_USE_TLS = True
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_CONFIGURED = bool(RESEND_API_KEY) or env_bool("USE_SMTP", False)
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "The Dot Com Experience <info@thedotcomexperience.com>")
+
+# allauth: email-based login.
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+# New accounts must confirm their email with a 6-digit code before they can sign in.
+# This switches on by itself once email can actually be sent (so nobody is locked out
+# waiting for a code that can never arrive).
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get(
+    "ACCOUNT_EMAIL_VERIFICATION", "mandatory" if EMAIL_CONFIGURED else "optional")
+ACCOUNT_EMAIL_VERIFICATION_BY_CODE_ENABLED = ACCOUNT_EMAIL_VERIFICATION == "mandatory"
+ALLAUTH_USER_CODE_FORMAT = {"numeric": True, "dashed": False, "length": 6}
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_FORMS = {"signup": "accounts.forms.DotxSignupForm"}
+ACCOUNT_ADAPTER = "accounts.adapter.DotxAccountAdapter"
+ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "website"     # hidden bot trap on the signup form
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "The Dot Com Experience: "
+
+# Two-step verification with an authenticator app (Google Authenticator, Authy, 1Password…).
+MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
+MFA_TOTP_ISSUER = "The Dot Com Experience"
+
+# Google reCAPTCHA v3 (invisible) on signup and the Dot forms. Switched on by setting
+# RECAPTCHA_SECRET_KEY in the config vars. The site key is public by design; the secret
+# key must never be written into code.
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "6LdAoh0uAAAAACSjYQ07yEgFaDhccnbfjlBddTGd")
+RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
+RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))
+
+LOGIN_REDIRECT_URL = "/accounts/profile/"
+LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login/"
 
 # --- Organization (tiers) -------------------------------------------------
 # Size limits from the Charter schedules. Going over shows a warning in the admin;

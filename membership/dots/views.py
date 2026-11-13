@@ -60,11 +60,12 @@ def waitlist_signup(request):
         return redirect("dots_finder")
     form = WaitlistForm(request.POST)
     if form.is_valid():
-        form.save()
+        if not form.is_bot:          # a bot gets the same "thanks" but nothing is saved
+            form.save()
         # (Optional) also forward to the Node /api/subscribe funnel — see billing/notify.py
         messages.success(request, "You're on the list. We'll be in touch about a Dot near you.")
     else:
-        messages.error(request, "Please check the form and try again.")
+        messages.error(request, "; ".join(form.non_field_errors()) or "Please check the form and try again.")
     return redirect("dots_finder")
 
 
@@ -76,9 +77,10 @@ def request_dot(request):
             app = form.save(commit=False)
             if request.user.is_authenticated:
                 app.user = request.user
-            app.save()
+            if not form.is_bot:      # a bot sees the same page but nothing is saved
+                app.save()
             return render(request, "dots/request_done.html", {"application": app})
-        messages.error(request, "Please check the form and try again.")
+        messages.error(request, "; ".join(form.non_field_errors()) or "Please check the form and try again.")
     else:
         initial = {}
         if request.user.is_authenticated:

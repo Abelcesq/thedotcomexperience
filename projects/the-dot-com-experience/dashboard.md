@@ -4,7 +4,7 @@
 > rhythm in `command-center.md`. A future portfolio-level manager reads this for a 30-second
 > roll-up.
 
-**Last updated:** 2026-11-11 · **Updated by:** Claude (PM) · **Phase:** 2 (front door LIVE; building audience → Skool)
+**Last updated:** 2026-11-13 · **Updated by:** Claude (PM) · **Phase:** 2 (front door LIVE; building audience → Skool)
 
 ## Status at a glance
 | Pillar | State | Note |
@@ -35,6 +35,12 @@ bridge (standard CTA + launch posts), and scope the first local event.
 5. Faith framing: explicit / friendly / universal.
 
 ## Recent activity
+- 2026-11-13 — **Spam + security**: the public sign-up form now requires an emailed 6-digit
+  code (bots were triggering welcome emails to strangers), with Google reCAPTCHA v3, a bot
+  trap and rate limits; member signup gets the same plus optional Google Authenticator
+  two-step verification. **Text reminders** for Dots built (Twilio), off until the account
+  and carrier registration are done. Config vars pending: see `membership/SECURITY_SETUP.md`
+  and `membership/SMS_SETUP.md`.
 - 2026-11-11 — **Tiers + community** in the member platform: unique Member IDs, Member →
   Ambassador → Local Leader → Regional with upline links and an admin organization report
   (caps 30/10/10), member directory, connections, private messaging with block/report.

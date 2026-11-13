@@ -24,6 +24,14 @@
   </div>
 </div>
 
+{% if not two_step_on %}
+  <div class="callout">
+    <strong>Protect your account with two-step verification.</strong>
+    It takes about a minute with the free Google Authenticator app, and it means a stolen password alone can't get into your account.
+    {% if email_verified %}<a href="{% url 'mfa_activate_totp' %}">Set it up now →</a>{% else %}<a href="{% url 'account_email' %}">First, confirm your email →</a>{% endif %}
+  </div>
+{% endif %}
+
 {% if stripe_pending %}
   <div class="callout">Payment complete — your plan is being activated. This page will reflect the change within a few seconds.</div>
 {% endif %}
@@ -39,7 +47,28 @@
   <div class="row"><span class="k">Member since</span><span class="v">{{ request.user.date_joined|date:"M j, Y" }}</span></div>
   <div class="submit">
     <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>
-    <a class="btn btn-ghost btn-sm" href="{% url 'account_change_password' %}">Change password</a>
+  </div>
+</div>
+
+<!-- Security -->
+<div class="card" id="security">
+  <h3>Security</h3>
+  <div class="secure-row">
+    <span><strong>Email</strong><br><span class="muted">{{ request.user.email }}</span></span>
+    <span>{% if email_verified %}<span class="pill on">Confirmed</span>{% else %}<span class="pill off">Not confirmed</span>
+      <a class="btn btn-ghost btn-sm" href="{% url 'account_email' %}">Confirm email</a>{% endif %}</span>
+  </div>
+  <div class="secure-row">
+    <span><strong>Two-step verification</strong><br><span class="muted">A 6-digit code from Google Authenticator each time you sign in.</span></span>
+    <span>{% if two_step_on %}<span class="pill on">On</span>
+      <a class="btn btn-ghost btn-sm" href="{% url 'mfa_index' %}">Manage</a>
+      {% elif email_verified %}<span class="pill off">Off</span>
+      <a class="btn btn-sm" href="{% url 'mfa_activate_totp' %}">Set up</a>
+      {% else %}<span class="pill off">Off</span> <span class="help">Confirm your email first</span>{% endif %}</span>
+  </div>
+  <div class="secure-row">
+    <span><strong>Password</strong></span>
+    <span><a class="btn btn-ghost btn-sm" href="{% url 'account_change_password' %}">Change password</a></span>
   </div>
 </div>
 

@@ -40,6 +40,10 @@ local-circle finder, the **Request a new Dot location** application, and
   connection requests, private messages, block + report, and a "My team" view
   for Charter holders. Email, phone, and billing are never shown to members.
   Messaging requires a connection or a direct upline/downline link.
+- **Spam protection & account security**: Google reCAPTCHA v3 and a hidden bot trap
+  on signup and the Dot forms, email verification by 6-digit code, email delivery
+  through Resend, and optional two-step verification (authenticator app + backup
+  codes). See `SECURITY_SETUP.md` for the config vars that switch each on.
 - **Text reminders** (`sms/`): Twilio texts to opted-in, seated members ~3 hours
   before their Dot meets (quiet hours 8am–9pm, one per member per meeting), an
   opt-in confirmation, STOP/START handling at `/sms/inbound/`, and a send log.

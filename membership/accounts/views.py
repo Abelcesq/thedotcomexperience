@@ -18,7 +18,16 @@ def profile(request):
         DotMembership.objects.select_related("dot").filter(user=request.user).first()
     )
 
+    # Account security: is the email confirmed, and is two-step verification switched on?
+    from allauth.account.models import EmailAddress
+    from allauth.mfa.models import Authenticator
+    email_verified = EmailAddress.objects.filter(user=request.user, verified=True).exists()
+    two_step_on = Authenticator.objects.filter(
+        user=request.user, type=Authenticator.Type.TOTP).exists()
+
     context = {
+        "email_verified": email_verified,
+        "two_step_on": two_step_on,
         "profile": profile,
         "stripe_pending": stripe_pending,
         "dot_membership": dot_membership,

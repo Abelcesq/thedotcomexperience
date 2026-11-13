@@ -3,6 +3,8 @@ from allauth.account.forms import SignupForm
 from django import forms
 from django.utils import timezone
 
+from thedotx.captcha import CaptchaFormMixin
+
 from .countries import COUNTRIES, PREFERRED
 from .models import Profile
 
@@ -24,8 +26,10 @@ COC_LABEL = (
 )
 
 
-class DotxSignupForm(SignupForm):
+class DotxSignupForm(CaptchaFormMixin, SignupForm):
     """allauth signup + first name and the required Code of Conduct agreement."""
+
+    captcha_action = "signup"
 
     first_name = forms.CharField(
         max_length=60, required=False, label="First name",

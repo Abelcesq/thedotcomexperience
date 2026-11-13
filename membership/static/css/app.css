@@ -203,3 +203,16 @@ details.more textarea{width:100%;min-height:70px;margin:.6rem 0;padding:.7rem .9
 .phone-row .phone-num input{height:3.05rem;border-radius:0 10px 10px 0}
 .phone-row select:focus{outline:2px solid var(--gold-solid);outline-offset:1px;border-color:transparent;position:relative;z-index:1}
 .phone-row .phone-num input:focus{position:relative;z-index:1}
+/* Sign-in pages (verification code, password reset, two-step verification) */
+.auth-hero{padding:2.2rem 0 1.4rem}
+.auth-card{max-width:520px;margin-inline:auto}
+.auth-card img{background:#fff;padding:10px;border-radius:12px;max-width:220px;height:auto;display:block;margin:.6rem 0}
+.auth-card p,main.shell > p{color:#cdd8e6}
+main.shell > p,main.shell > ul{max-width:520px;margin-inline:auto}
+.auth-h2{font-size:1.4rem;font-weight:500;margin:1.6rem auto .4rem;max-width:520px}
+.auth-form .submit{margin-top:.2rem}
+.field input[type=number]{width:100%;padding:.8rem 1rem;border-radius:10px;border:1px solid var(--line);background:#060f1d;color:var(--ink);font-family:var(--font-body);font-size:1rem}
+.secure-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.secure-row:last-of-type{border-bottom:none}
+.pill.on{color:#8fe3bf;border-color:rgba(143,227,191,.4)}
+.pill.off{color:#f0c674;border-color:rgba(240,198,116,.4)}

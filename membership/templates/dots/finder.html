@@ -87,6 +87,8 @@
         {% for radio in waitlist_form.intent %}<li>{{ radio }}</li>{% endfor %}
       </ul>
     </div>
+    {{ waitlist_form.website }}
+    {% include "_captcha.html" with action="waitlist" %}
     <div class="submit"><button class="btn" type="submit">Keep me posted →</button></div>
   </form>
 </div>
