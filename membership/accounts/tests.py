@@ -170,6 +170,13 @@ class FooterTests(TestCase):
                 self.assertContains(page, f'href="{link}"', msg_prefix=url)
             self.assertNotContains(page, "<b>·</b>")
 
+    def test_top_and_bottom_banners_carry_the_full_name_and_no_founder_link(self):
+        page = self.client.get(reverse("account_login"))
+        brand = 'The Dot Com Experience <span class="bdot" aria-hidden="true"></span> The DotX</a>'
+        self.assertContains(page, brand, count=2)          # header and footer
+        self.assertNotContains(page, ">Founder<")
+        self.assertNotContains(page, "abelcalderon.com")
+
 
 class OwnProfilePageTests(TestCase):
     def test_profile_page_shows_member_id_and_tier(self):

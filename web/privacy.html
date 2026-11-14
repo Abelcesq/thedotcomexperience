@@ -55,7 +55,9 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.12;margin:0;}
 /* NAV — matches home */
 header.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(5,12,22,.72);border-bottom:1px solid var(--line);}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;flex-wrap:wrap;}
-.brand{font-family:var(--font-display);font-size:1.15rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none;font-weight:600;white-space:nowrap;}
+.brand{font-family:var(--font-display);font-size:min(1.15rem,calc((100vw - 42px)/25));letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none;font-weight:600;white-space:nowrap;}
+.brand .bdot{display:inline-block;width:.42em;height:.42em;border-radius:50%;background:var(--gold);margin:0 .22em 0 .08em;vertical-align:.13em}
+footer .brand{font-size:min(1rem,calc((100vw - 42px)/25))}
 nav.links{display:flex;gap:22px;align-items:center;flex-wrap:wrap;}
 nav.links a{color:var(--muted);text-decoration:none;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;}
 nav.links a:hover{color:var(--fg);}
@@ -108,7 +110,7 @@ footer a:hover{color:var(--gold);}
 <body>
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="/">The Dot Com Experience</a>
+    <a class="brand" href="/">The Dot Com Experience <span class="bdot" aria-hidden="true"></span> The DotX</a>
     <nav class="links">
       <a class="hide-sm" href="/#find">Find a Dot</a>
       <a class="hide-sm" href="/about">About</a>
@@ -290,7 +292,7 @@ footer a:hover{color:var(--gold);}
 <footer>
   <div class="wrap">
     <div class="frow">
-      <a class="brand" href="/" style="font-size:1rem">The Dot Com Experience</a>
+      <a class="brand" href="/">The Dot Com Experience <span class="bdot" aria-hidden="true"></span> The DotX</a>
       <div class="flinks">
         <a href="/#find">Find a Dot</a>
         <a href="/#join">Membership</a>
@@ -298,7 +300,6 @@ footer a:hover{color:var(--gold);}
         <a href="/about">About</a>
         <a href="/terms">Terms</a>
         <a href="/privacy">Privacy</a>
-        <a href="https://abelcalderon.com/" target="_blank" rel="noopener">Founder</a>
       </div>
     </div>
     <div class="frow">
