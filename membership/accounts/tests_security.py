@@ -125,6 +125,22 @@ class CaptchaTests(Base):
             self.client.post(url, {**right, "g-recaptcha-response": "tok"})
         self.assertIn("_auth_user_id", self.client.session)
 
+    def test_staff_admin_login_needs_the_box_ticked_too(self):
+        User.objects.create_superuser("boss", "boss@example.com", PASSWORD)
+        url = reverse("admin:login")
+        self.assertContains(self.client.get(url), 'class="g-recaptcha" data-sitekey="site" data-theme="light"')
+        creds = {"username": "boss", "password": PASSWORD, "next": "/admin/"}
+        with patch("thedotx.captcha._ask_google", return_value=HUMAN) as google:
+            self.assertContains(self.client.post(url, creds), "Please tick the")
+            google.assert_not_called()
+        self.assertNotIn("_auth_user_id", self.client.session)
+        with patch("thedotx.captcha._ask_google", return_value=ROBOT):
+            self.client.post(url, {**creds, "g-recaptcha-response": "tok"})
+        self.assertNotIn("_auth_user_id", self.client.session)
+        with patch("thedotx.captcha._ask_google", return_value=HUMAN):
+            self.client.post(url, {**creds, "g-recaptcha-response": "tok"})
+        self.assertIn("_auth_user_id", self.client.session)
+
     def test_if_google_is_unreachable_real_people_are_not_locked_out(self):
         with patch("thedotx.captcha._ask_google", side_effect=OSError("down")):
             self.client.post(reverse("account_signup"), signup_data(**{"g-recaptcha-response": "tok"}))
@@ -145,6 +161,13 @@ class CaptchaTests(Base):
             self.assertEqual(DotApplication.objects.count(), 0, "bot trap: nothing saved")
             self.client.post(reverse("request_dot"), {**apply, "g-recaptcha-response": "tok"})
             self.assertEqual(DotApplication.objects.count(), 1)
+
+    def test_admin_login_works_normally_when_recaptcha_is_off(self):
+        User.objects.create_superuser("boss", "boss@example.com", PASSWORD)
+        with self.settings(RECAPTCHA_SECRET_KEY=""):
+            self.assertNotContains(self.client.get(reverse("admin:login")), "g-recaptcha")
+            self.client.post(reverse("admin:login"), {"username": "boss", "password": PASSWORD, "next": "/admin/"})
+        self.assertIn("_auth_user_id", self.client.session)
 
     def test_forms_show_no_recaptcha_until_both_keys_are_set(self):
         with self.settings(RECAPTCHA_SITE_KEY=""):

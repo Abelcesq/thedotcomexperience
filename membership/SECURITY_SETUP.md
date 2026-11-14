@@ -68,7 +68,10 @@ delete that member's entries. They can then sign in with their password and set 
 ## reCAPTCHA notes
 
 - On the login page the checkbox is checked before the password is looked at, so the page
-  cannot be used to test stolen passwords. The Django admin sign-in at `/admin/` has no checkbox.
+  cannot be used to test stolen passwords. The staff sign-in at `/admin/` has the same checkbox.
+- If the checkbox ever stops you signing in to `/admin/` (for example the keys were changed),
+  delete `RECAPTCHA_SECRET_KEY` from the app's config vars: the checkbox switches off and the
+  normal password sign-in works again.
 
 - Allowed domains at Google must include every address the forms are served from:
   `www.thedotx.com`, `members.thedotx.com`, `www.thedotcomexperience.com`.

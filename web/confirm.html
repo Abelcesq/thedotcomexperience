@@ -50,11 +50,11 @@ h1,h2,h3{font-family:var(--font-display);line-height:1.12;margin:0;}
 header.nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(10px);background:rgba(5,12,22,.72);border-bottom:1px solid var(--line);}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;flex-wrap:wrap;}
 .brand{font-family:var(--font-display);font-size:1.15rem;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none;font-weight:600;white-space:nowrap;}
-.brand b{color:var(--gold);font-weight:600;}
 nav.links{display:flex;gap:22px;align-items:center;flex-wrap:wrap;}
 nav.links a{color:var(--muted);text-decoration:none;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;}
 nav.links a:hover{color:var(--fg);}
 nav.links a.login{color:var(--fg);}
+  nav.links a.btn-gold,nav.links a.btn-gold:hover{color:#1a1405}
 .btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;font-weight:700;text-decoration:none;cursor:pointer;font-family:var(--font-body);transition:transform .15s,background .15s,border-color .15s;}
 .btn:hover{transform:translateY(-1px);}
 .btn-gold{background:var(--gold);color:#1a1405;padding:11px 20px;font-size:.9rem;border:1px solid var(--gold);}
@@ -102,7 +102,7 @@ footer a:hover{color:var(--gold);}
 <body>
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="/">The Dot<b>·</b>Com Experience</a>
+    <a class="brand" href="/">The Dot Com Experience</a>
     <nav class="links">
       <a class="hide-sm" href="/#find">Find a Dot</a>
       <a class="hide-sm" href="/about">About</a>
@@ -156,7 +156,7 @@ footer a:hover{color:var(--gold);}
 <footer>
   <div class="wrap">
     <div class="frow">
-      <a class="brand" href="/" style="font-size:1rem">The Dot<b>·</b>Com Experience</a>
+      <a class="brand" href="/" style="font-size:1rem">The Dot Com Experience</a>
       <div class="flinks">
         <a href="/#find">Find a Dot</a>
         <a href="/#join">Membership</a>

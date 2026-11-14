@@ -1,7 +1,7 @@
 {# Google reCAPTCHA "I'm not a robot" checkbox. Shown only when both keys are configured. #}
 {% if RECAPTCHA_SITE_KEY %}
 <div class="formrow captcha">
-  <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" data-theme="dark"></div>
+  <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_SITE_KEY }}" data-theme="{{ theme|default:'dark' }}"></div>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </div>
 {% endif %}

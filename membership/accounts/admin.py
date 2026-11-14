@@ -1,11 +1,27 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
+from django.contrib.admin.forms import AdminAuthenticationForm
 from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils.html import format_html
 
+from thedotx import captcha
+
 from .models import Profile, TierChange
+
+
+class CaptchaAdminLoginForm(AdminAuthenticationForm):
+    """The staff sign-in form, with the "I'm not a robot" checkbox when reCAPTCHA is configured."""
+
+    def clean(self):
+        # Checked before the password, exactly as on the member login.
+        if captcha.enabled() and not captcha.passes(self.data.get(captcha.FIELD, "")):
+            raise forms.ValidationError(captcha.MESSAGE)
+        return super().clean()
+
+
+admin.site.login_form = CaptchaAdminLoginForm
 
 R = Profile.Role
 
