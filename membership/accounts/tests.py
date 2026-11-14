@@ -157,6 +157,20 @@ class AdminTests(TestCase):
         self.assertTrue(TierChange.objects.filter(profile=self.m1, to_role=R.AMBASSADOR).exists())
 
 
+class FooterTests(TestCase):
+    def test_every_page_footer_links_to_the_social_accounts(self):
+        me = make("me@x.com")
+        self.client.force_login(me.user)
+        for url in (reverse("account_login"), reverse("dots_finder"), reverse("join"),
+                    reverse("profile"), reverse("member_directory")):
+            page = self.client.get(url, follow=True)
+            for link in ("https://www.facebook.com/thedotcomexperience",
+                         "https://www.instagram.com/thedotcomexperience",
+                         "https://x.com/thedotcomexp"):
+                self.assertContains(page, f'href="{link}"', msg_prefix=url)
+            self.assertNotContains(page, "<b>·</b>")
+
+
 class OwnProfilePageTests(TestCase):
     def test_profile_page_shows_member_id_and_tier(self):
         amb = make("amb@x.com", R.AMBASSADOR, name="Ana Ambassador")
