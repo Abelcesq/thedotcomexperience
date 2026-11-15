@@ -112,6 +112,16 @@ input:focus,textarea:focus{outline:2px solid var(--gold-solid);outline-offset:1p
 .leaflet-control-zoom a:hover{background:#13233b}
 @media(max-width:640px){.map-wrap{height:340px}}
 /* CLOSING + FOOTER — matches home */
+/* Social links band above the closing — matches the home page */
+.social-band{text-align:center;padding-block:56px;margin-top:40px;border-top:1px solid var(--line);position:relative;z-index:1}
+.social-band .kicker{font-size:.76rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0 0 14px}
+.social-band h2{font-weight:500;font-size:clamp(1.9rem,4.4vw,2.9rem);line-height:1.08;margin:0 0 18px;text-wrap:balance}
+.social-band p.intro{max-width:60ch;color:var(--muted);margin:0 auto 8px;font-size:1.06rem}
+.social-band .ai-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.social-btn{gap:.55rem;padding:11px 20px;font-size:.9rem}
+.social-btn svg.ico{width:1.5rem;height:1.5rem;flex:0 0 auto}
+.social-btn .sk-chip{display:inline-flex;align-items:center;height:1.5rem;padding:0 .42rem;border-radius:.4rem;background:#fff;flex:0 0 auto}
+.social-btn .sk-chip svg{height:.8rem;width:2.37rem;display:block}
 .closing{text-align:center;padding-block:60px;position:relative;z-index:1}
 .closing h2{font-size:clamp(2.1rem,5vw,3.3rem);font-weight:500}
 .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:22px}

@@ -178,6 +178,17 @@ class FooterTests(TestCase):
         self.assertNotContains(page, ">Founder<")
         self.assertNotContains(page, "abelcalderon.com")
 
+    def test_social_links_section_sits_above_the_closing(self):
+        page = self.client.get(reverse("account_login")).content.decode()
+        self.assertIn("Follow the movement</h2>", page)
+        self.assertLess(page.index('id="social"'), page.index('class="closing"'))
+        section = page[page.index('id="social"'):page.index('class="closing"')]
+        for link in ("https://www.skool.com/the-dot-comp-experience-1714/about",
+                     "https://www.facebook.com/thedotcomexperience",
+                     "https://www.instagram.com/thedotcomexperience",
+                     "https://x.com/thedotcomexp"):
+            self.assertIn(f'href="{link}"', section)
+
     def test_footer_community_link_goes_to_the_community_page(self):
         page = self.client.get(reverse("account_login"))
         self.assertContains(page, '<a href="https://www.thedotx.com/community">Community</a>')
