@@ -181,7 +181,7 @@ class FooterTests(TestCase):
     def test_footer_community_link_goes_to_the_community_page(self):
         page = self.client.get(reverse("account_login"))
         self.assertContains(page, '<a href="https://www.thedotx.com/community">Community</a>')
-        self.assertContains(page, 'href="https://www.thedotx.com/community">Enter the community</a>')
+        self.assertContains(page, 'href="https://www.thedotx.com/community">Join Our Community</a>')
 
 
 class OwnProfilePageTests(TestCase):

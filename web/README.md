@@ -15,10 +15,10 @@ movement and send the right people to the **Skool** community. This is the middl
 
 ## The one link that matters
 Primary CTA → **/community** (`community.html`), which holds the Skool, Facebook, Instagram and X links.
-"Join our community" on the home page, the closing "Enter the community" button and the footer
+"Join our community" on the home page, the closing "Join Our Community" button and the footer
 "Community" link all go there. The Skool URL
 (**https://www.skool.com/the-dot-comp-experience-1714/about**) lives on `community.html`; that page's own
-"Enter the community" button goes straight to Skool.
+"Join Our Community" button goes straight to Skool.
 
 ## Built-in AI discoverability (Step 6 — done)
 - Semantic HTML5 (`<header>`, `<section>`, `<article>`, `<footer>`, one `<h1>`).
