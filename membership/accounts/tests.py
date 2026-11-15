@@ -210,6 +210,19 @@ class FooterTests(TestCase):
 
 
 class OwnProfilePageTests(TestCase):
+    def test_my_page_is_the_first_profile_button_for_members(self):
+        me = make("paid@x.com")
+        self.client.force_login(me.user)
+        page = self.client.get(reverse("profile")).content.decode()
+        link = f'href="{reverse("member_profile", args=[me.member_id])}">My page</a>'
+        actions = page[page.index('class="pf-actions"'):]
+        self.assertIn(link, actions)
+        self.assertLess(actions.index(link), actions.index(">Edit profile</a>"))
+        self.assertEqual(self.client.get(reverse("member_profile", args=[me.member_id])).status_code, 200)
+        # not shown until the membership is active, because the page isn't open to them yet
+        self.client.force_login(make("new@x.com", status="incomplete").user)
+        self.assertNotContains(self.client.get(reverse("profile")), ">My page</a>")
+
     def test_profile_header_has_an_account_and_billing_button(self):
         for who in (make("paid@x.com"), make("new@x.com", status="incomplete")):
             self.client.force_login(who.user)

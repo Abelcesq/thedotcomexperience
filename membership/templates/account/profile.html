@@ -12,6 +12,7 @@
     </div>
     {% if profile.bio %}<p class="pf-bio">{{ profile.bio }}</p>{% endif %}
     <div class="pf-actions">
+      {% if profile.can_use_community %}<a class="btn btn-ghost btn-sm" href="{% url 'member_profile' profile.member_id %}">My page</a>{% endif %}
       <a class="btn btn-ghost btn-sm" href="{% url 'profile_edit' %}">Edit profile</a>
       {% if profile.can_use_community %}
         <a class="btn btn-ghost btn-sm" href="{% url 'member_directory' %}">Members</a>
