@@ -123,7 +123,9 @@ footer a{color:var(--muted);text-decoration:none;font-size:.86rem}
 footer a:hover{color:var(--gold)}
 .fsocial{display:flex;gap:20px;flex-wrap:wrap}
 .fsocial a{display:inline-flex;align-items:center;gap:.45rem}
-.fsocial svg{width:1rem;height:1rem;flex:0 0 auto}
+.fsocial svg.ico{width:1.2rem;height:1.2rem;flex:0 0 auto}
+.fsocial .sk-chip{display:inline-flex;align-items:center;height:1.2rem;padding:0 .32rem;border-radius:.3rem;background:#fff;flex:0 0 auto}
+.fsocial .sk-chip svg{height:.62rem;width:1.84rem;display:block}
 .tags{font-size:.78rem;color:#6f829a;letter-spacing:.04em}
 .fine{font-size:.78rem;color:#6f829a}
 @media(max-width:640px){nav.links a.hide-sm{display:none}}

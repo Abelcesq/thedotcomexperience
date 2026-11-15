@@ -164,7 +164,8 @@ class FooterTests(TestCase):
         for url in (reverse("account_login"), reverse("dots_finder"), reverse("join"),
                     reverse("profile"), reverse("member_directory")):
             page = self.client.get(url, follow=True)
-            for link in ("https://www.facebook.com/thedotcomexperience",
+            for link in ("https://www.skool.com/the-dot-comp-experience-1714/about",
+                         "https://www.facebook.com/thedotcomexperience",
                          "https://www.instagram.com/thedotcomexperience",
                          "https://x.com/thedotcomexp"):
                 self.assertContains(page, f'href="{link}"', msg_prefix=url)
@@ -181,7 +182,6 @@ class FooterTests(TestCase):
         page = self.client.get(reverse("account_login"))
         self.assertContains(page, '<a href="https://www.thedotx.com/community">Community</a>')
         self.assertContains(page, 'href="https://www.thedotx.com/community">Enter the community</a>')
-        self.assertNotContains(page, "skool.com")
 
 
 class OwnProfilePageTests(TestCase):
