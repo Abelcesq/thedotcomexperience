@@ -6,6 +6,7 @@ from django.utils import timezone
 from thedotx import captcha
 from thedotx.captcha import CaptchaFormMixin
 
+from . import photos
 from .countries import COUNTRIES, PREFERRED
 from .models import Profile
 
@@ -77,6 +78,14 @@ class ProfileForm(forms.ModelForm):
     international (E.164) number, e.g. +19165550123.
     """
 
+    photo = forms.FileField(
+        label="Profile photo", required=False,
+        widget=forms.FileInput(attrs={"accept": photos.ACCEPT, "data-photo-input": "",
+                                      "data-photo-preview": "#photo-preview"}),
+        help_text="Optional. A JPG, PNG or WebP picture of you. Other members see it on your page and "
+                  "in the member directory.",
+    )
+    remove_photo = forms.BooleanField(label="Remove my current photo", required=False)
     phone_country = forms.ChoiceField(
         label="Country", required=False, choices=_country_choices, initial="US",
         widget=forms.Select(attrs={"autocomplete": "tel-country-code", "aria-label": "Country code"}),
@@ -113,7 +122,7 @@ class ProfileForm(forms.ModelForm):
                                          "placeholder": "What brought you here?"}),
         }
 
-    field_order = ["display_name", "city", "bio", "directory_visible",
+    field_order = ["photo", "remove_photo", "display_name", "city", "bio", "directory_visible",
                    "phone_country", "phone_number", "sms_opt_in"]
 
     def __init__(self, *args, **kwargs):
@@ -122,6 +131,7 @@ class ProfileForm(forms.ModelForm):
         self._was_opted_in = bool(self.instance.pk and self.instance.sms_opt_in)
         self._old_phone = self.instance.phone if self.instance.pk else ""
         self.newly_opted_in = False
+        self._photo_bytes = None
         # Show a saved number split back into its country and local parts.
         stored = self.instance.phone if self.instance and self.instance.pk else ""
         if stored:
@@ -153,6 +163,12 @@ class ProfileForm(forms.ModelForm):
         cleaned["phone"] = phone
         if cleaned.get("sms_opt_in") and not phone and "phone_number" not in self.errors:
             self.add_error("phone_number", "Add a phone number to receive texts about your Dot.")
+        # A new photo is checked and shrunk here, so a bad file is reported next to the field.
+        if cleaned.get("photo"):
+            try:
+                self._photo_bytes = photos.prepare(cleaned["photo"])
+            except photos.PhotoError as problem:
+                self.add_error("photo", str(problem))
         return cleaned
 
     def save(self, commit=True):
@@ -165,4 +181,10 @@ class ProfileForm(forms.ModelForm):
                 self.newly_opted_in = True
         else:
             profile.sms_opt_in_at = None
-        return super().save(commit=commit)
+        saved = super().save(commit=commit)
+        if commit:
+            if self._photo_bytes:                       # a new photo replaces the old one
+                photos.save_bytes(saved, self._photo_bytes)
+            elif self.cleaned_data.get("remove_photo"):
+                photos.remove_photo(saved)
+        return saved

@@ -152,7 +152,24 @@ footer a:hover{color:var(--gold)}
 .avatar{--ring:var(--line);flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;
   background:radial-gradient(circle at 30% 25%,#1c3152,#0a1628 70%);border:2px solid var(--ring);color:var(--fg);
   font-family:var(--font-display);font-weight:600;font-size:1.15rem;letter-spacing:.04em;text-decoration:none}
+.avatar{position:relative;overflow:hidden}
+.avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .avatar.lg{width:132px;height:132px;font-size:2.7rem;border-width:3px}
+/* profile photo: picker under the avatar (member page) and in the edit form */
+.pf-photo{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.photo-form{display:flex;gap:.8rem;align-items:center;margin:0}
+.photo-pick{position:relative;cursor:pointer;font-size:.78rem;font-weight:700;color:var(--gold);border:1px solid var(--line);border-radius:999px;padding:.35rem .85rem;transition:border-color .15s}
+.photo-pick:hover{border-color:var(--gold)}
+.photo-pick:focus-within{outline:2px solid var(--gold);outline-offset:2px}
+.photo-pick input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.photo-remove{background:none;border:none;padding:0;color:var(--muted);font-family:var(--font-body);font-size:.78rem;text-decoration:underline;cursor:pointer}
+.photo-remove:hover{color:var(--fg)}
+.photo-row{display:flex;gap:1.6rem;align-items:center;flex-wrap:wrap}
+.photo-row .field{flex:1 1 260px;min-width:0}
+.photo-row .field label.checkbox{text-transform:none;letter-spacing:0;font-size:.9rem;font-weight:400;color:#cdd8e6;margin-top:.3rem}
+input[type=file]{max-width:100%;color:var(--muted);font-family:var(--font-body);font-size:.9rem}
+input[type=file]::file-selector-button{margin-right:.8rem;padding:.5rem 1.1rem;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--fg);font-family:var(--font-body);font-weight:700;font-size:.85rem;cursor:pointer}
+input[type=file]::file-selector-button:hover{border-color:var(--gold);color:var(--gold)}
 .avatar.sm{width:38px;height:38px;font-size:.9rem}
 .avatar.t-member{--ring:rgba(139,127,214,.65)}
 .avatar.t-ambassador{--ring:#e8c06a}
@@ -210,7 +227,7 @@ details.more textarea{width:100%;min-height:70px;margin:.6rem 0;padding:.7rem .9
 .field textarea{width:100%;padding:.8rem 1rem;border-radius:10px;border:1px solid var(--line);background:#060f1d;color:var(--ink);font-family:var(--font-body);font-size:1rem}
 .btn-danger{background:transparent;color:#f0c9c9;border:1px solid rgba(227,155,155,.45)}
 .btn-danger:hover{background:rgba(227,155,155,.1);border-color:#e39b9b}
-@media(max-width:640px){.pf{flex-direction:column;align-items:flex-start;gap:1.2rem}.avatar.lg{width:104px;height:104px;font-size:2.1rem}.bubble{max-width:90%}}
+@media(max-width:640px){.pf{flex-direction:column;align-items:flex-start;gap:1.2rem}.pf-photo{align-items:flex-start}.avatar.lg{width:104px;height:104px;font-size:2.1rem}.bubble{max-width:90%}}
 /* Phone: country code + number, joined */
 .phone-row{display:flex;align-items:flex-end}
 .phone-row .phone-cc{flex:0 0 6.6rem}

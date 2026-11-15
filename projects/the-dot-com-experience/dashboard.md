@@ -18,7 +18,7 @@
 | Community home (Skool) | 🟢 | Live: the-dot-comp-experience-1714. The funnel's destination. |
 | Email capture | 🟢 **LIVE** | Form → Heroku → **MailerLite** (owned list, free ≤1,000). Verified end-to-end (test subscriber landed). |
 | Audience / list | 🟡 | IG + X presence underway; capture now owned in MailerLite. Next: drive traffic + a welcome automation. |
-| Member platform | 🟢 **LIVE** | members.thedotx.com (Django, Heroku `thedotx-members`): accounts, $100/mo Stripe billing on the 1st, Member IDs, four tiers, org report, directory, connections, messages. |
+| Member platform | 🟢 **LIVE** | members.thedotx.com (Django, Heroku `thedotx-members`): accounts, $100/mo Stripe billing on the 1st, Member IDs, four tiers, org report, directory, connections, messages, profile photos. |
 | Compensation plan | 🔴 | Designed (Charter docs) but **not built and not payable** until an FTC/direct-selling attorney and CA employment counsel review it. |
 | Offer / events | 🔴 | First in-person event not yet defined — the moat, Phase 3+. |
 
@@ -41,6 +41,11 @@ bridge (standard CTA + launch posts), and scope the first local event.
   two-step verification. **Text reminders** for Dots built (Twilio), off until the account
   and carrier registration are done. Config vars pending: see `membership/SECURITY_SETUP.md`
   and `membership/SMS_SETUP.md`.
+- 2026-11-15 — **Brand line, community page, profile photos.** Banners read "The Dot Com
+  Experience • The DotX"; new `/community` page (Skool, Facebook, Instagram, X) that the
+  community buttons point to; founder section and links removed from the site; hero video
+  rebuilt (bold www.thedotx.com, 10s hold); members can add a profile photo (stored in the
+  database, removable by admin). Privacy Policy updated for photos.
 - 2026-11-11 — **Tiers + community** in the member platform: unique Member IDs, Member →
   Ambassador → Local Leader → Regional with upline links and an admin organization report
   (caps 30/10/10), member directory, connections, private messaging with block/report.

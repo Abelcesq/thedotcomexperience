@@ -7,10 +7,22 @@
 </section>
 
 <div class="card">
-  <form method="post" class="cols" novalidate>
+  <form method="post" class="cols" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
     {% for field in form %}
-      {% if field.name == 'sms_opt_in' or field.name == 'directory_visible' %}
+      {% if field.name == 'photo' %}
+        <div class="formrow photo-row">
+          {% include "community/_avatar.html" with p=profile size="lg" avatar_id="photo-preview" %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            <p class="helptext">{{ field.help_text }}</p>
+            {{ field.errors }}
+            {% if profile.has_photo %}<label class="checkbox">{{ form.remove_photo }} <span>{{ form.remove_photo.label }}</span></label>{% endif %}
+          </div>
+        </div>
+      {% elif field.name == 'remove_photo' %}
+      {% elif field.name == 'sms_opt_in' or field.name == 'directory_visible' %}
         <div class="formrow">
           <label class="checkbox">{{ field }} <span>{{ field.label }}</span></label>
           {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
@@ -48,6 +60,7 @@
   </form>
 </div>
 
+{% load static %}<script src="{% static 'js/photo.js' %}"></script>
 <script>
   // Country dropdown: show just the dialing code (+1) when closed, full names when open.
   (function(){

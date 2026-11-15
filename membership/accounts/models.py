@@ -60,6 +60,8 @@ class Profile(models.Model):
 
     # Community profile (what other members can see)
     bio = models.CharField(max_length=300, blank=True)
+    # Set when the member has a profile photo (the picture itself lives in ProfilePhoto).
+    photo_updated_at = models.DateTimeField(null=True, blank=True, editable=False)
     directory_visible = models.BooleanField(
         default=True,
         help_text="Show this member in the member directory and let other members view their profile.",
@@ -110,6 +112,23 @@ class Profile(models.Model):
     def initials(self):
         parts = [p for p in self.name.split() if p]
         return ("".join(p[0] for p in parts[:2]) or "M").upper()
+
+    # --- Profile photo ------------------------------------------------------
+    @property
+    def has_photo(self):
+        return self.photo_updated_at is not None
+
+    @property
+    def photo_url(self):
+        """Address of the member's photo, or "" when they have none.
+
+        The number on the end changes whenever the photo changes, so browsers can keep a
+        copy for a long time and still pick up a new photo straight away.
+        """
+        if not self.has_photo:
+            return ""
+        from django.urls import reverse
+        return f'{reverse("member_photo", args=[self.member_id])}?v={int(self.photo_updated_at.timestamp())}'
 
     # --- Membership / tier --------------------------------------------------
     @property
@@ -257,3 +276,18 @@ class TierChange(models.Model):
     def __str__(self):
         return (f"{self.profile.member_id}: {self.get_from_role_display()} → "
                 f"{self.get_to_role_display()} on {self.changed_at:%Y-%m-%d}")
+
+
+class ProfilePhoto(models.Model):
+    """A member's profile photo: one small square JPEG, kept in the database.
+
+    It is stored here rather than as a file because the web server's disk is wiped on every
+    deploy. Photos are shrunk to a few dozen kilobytes before saving (see accounts/photos.py).
+    """
+
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name="photo")
+    image = models.BinaryField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Photo of {self.profile.member_id}"

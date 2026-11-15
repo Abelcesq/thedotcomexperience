@@ -1,1 +1,1 @@
-<span class="avatar {{ size|default:'' }} t-{{ p.role }}" aria-hidden="true">{{ p.initials }}</span>
+<span class="avatar {{ size|default:'' }} t-{{ p.role }}"{% if avatar_id %} id="{{ avatar_id }}"{% endif %} aria-hidden="true">{{ p.initials }}{% if p.photo_updated_at %}<img src="{{ p.photo_url }}" alt="" decoding="async" onerror="this.remove()">{% endif %}</span>

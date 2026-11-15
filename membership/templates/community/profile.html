@@ -4,7 +4,17 @@
 {% if state == 'self' %}{% include "community/_subnav.html" with active="me" %}{% else %}{% include "community/_subnav.html" with active="" %}{% endif %}
 
 <div class="pf">
-  {% include "community/_avatar.html" with p=target size="lg" %}
+  <div class="pf-photo">
+    {% include "community/_avatar.html" with p=target size="lg" %}
+    {% if state == 'self' %}
+      <form method="post" action="{% url 'profile_photo' %}" enctype="multipart/form-data" class="photo-form">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}">
+        <label class="photo-pick"><input type="file" name="photo" accept="image/jpeg,image/png,image/webp" data-photo-input data-auto-submit><span>{% if target.has_photo %}Change photo{% else %}Add a photo{% endif %}</span></label>
+        {% if target.has_photo %}<button class="photo-remove" type="submit" name="remove" value="1">Remove</button>{% endif %}
+        <noscript><button class="btn btn-sm" type="submit">Upload</button></noscript>
+      </form>
+    {% endif %}
+  </div>
   <div class="pf-body">
     <h1 class="pf-name">{{ target.name }}{% include "community/_seal.html" with p=target %}</h1>
     <div class="pf-meta">
@@ -72,4 +82,5 @@
   </form>
 </details>
 {% endif %}
+{% if state == 'self' %}{% load static %}<script src="{% static 'js/photo.js' %}"></script>{% endif %}
 {% endblock %}

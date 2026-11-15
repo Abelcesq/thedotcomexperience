@@ -22,6 +22,12 @@ local-circle finder, the **Request a new Dot location** application, and
   (update card, invoices, cancel). No custom billing UI.
 - **Profile page** (`/accounts/profile/`): Account, Membership (plan / status /
   renews + Manage billing), My Dot, Help — mirrors the Tasks app layout.
+- **Profile photos**: a member can replace their initials with a picture from their member
+  page or the edit-profile form. Every upload is redrawn as a 400×400 JPEG (which also strips
+  location and other hidden details) and stored **in the database** (`ProfilePhoto`), because
+  Heroku's disk is wiped on every deploy. Photos are served at `/accounts/photo/<Member ID>/`
+  only to people allowed to see that member's page. Admin: the member list has a
+  "Remove profile photo from selected" action for taking one down. See `accounts/photos.py`.
 - **Profile details**: display name, **city** (for Dot matching), **phone (E.164)**
   + **"Text me about my Dot"** SMS consent. SMS is *collected only* (send later via
   Twilio once A2P 10DLC is done).

@@ -8,6 +8,7 @@ from django.utils.html import format_html
 
 from thedotx import captcha
 
+from . import photos
 from .models import Profile, TierChange
 
 
@@ -67,11 +68,12 @@ class ProfileAdmin(admin.ModelAdmin):
                      "stripe_customer_id", "stripe_subscription_id")
     autocomplete_fields = ("reports_to",)
     list_select_related = ("user", "reports_to", "reports_to__user")
-    readonly_fields = ("member_id", "role_since", "sms_opt_in_at", "stripe_customer_id", "stripe_subscription_id",
+    readonly_fields = ("member_id", "photo_preview", "role_since", "sms_opt_in_at", "stripe_customer_id", "stripe_subscription_id",
                        "current_period_end", "price_id", "coc_agreed_at",
                        "created_at", "updated_at")
     fieldsets = (
-        ("Member", {"fields": ("user", "member_id", "display_name", "city", "bio", "directory_visible")}),
+        ("Member", {"fields": ("user", "member_id", "photo_preview", "display_name", "city", "bio",
+                               "directory_visible")}),
         ("Tier & organization", {
             "fields": ("role", "role_since", "reports_to"),
             "description": "Everyone starts as a Member. A Member reports to an Ambassador, an "
@@ -87,7 +89,7 @@ class ProfileAdmin(admin.ModelAdmin):
     )
     inlines = [TierChangeInline]
     actions = ["make_ambassador", "make_local_leader", "make_regional", "make_member",
-               "assign_upline", "clear_upline", "send_test_text"]
+               "assign_upline", "clear_upline", "send_test_text", "remove_profile_photo"]
 
     # --- columns ---------------------------------------------------------------
     @admin.display(description="Name", ordering="display_name")
@@ -206,6 +208,22 @@ class ProfileAdmin(admin.ModelAdmin):
                 level=messages.WARNING)
         for line in failed:
             self.message_user(request, f"Failed — {line}", level=messages.ERROR)
+
+    @admin.display(description="Profile photo")
+    def photo_preview(self, obj):
+        if not obj or not obj.has_photo:
+            return "No photo"
+        return format_html('<img src="{}" alt="" width="96" height="96" style="border-radius:50%">'
+                           '<br><small>To take it down, use the "Remove profile photo" action in the member list.</small>',
+                           obj.photo_url)
+
+    @admin.action(description="Remove profile photo from selected")
+    def remove_profile_photo(self, request, queryset):
+        removed = 0
+        for profile in queryset.exclude(photo_updated_at=None):
+            photos.remove_photo(profile)
+            removed += 1
+        self.message_user(request, f"Removed {removed} profile photo{'s' if removed != 1 else ''}.")
 
     @admin.action(description="Remove selected from their upline")
     def clear_upline(self, request, queryset):
