@@ -8,7 +8,10 @@ movement and send the right people to the **Skool** community. This is the middl
 - **`index.html`** — the live front door (cosmic theme, animated sigil + logo video, three-layer
   story, philosophy tenets, and the primary CTA → Skool). ~54KB, self-contained except fonts.
 - **`assets/`**
-  - `dotx-cosmic-logo.mp4` — the hero cosmic logo animation.
+  - `dotx-cosmic-720.mp4` / `dotx-cosmic-1080.mp4` — the hero cosmic logo animation (17s: the 7s animation,
+    then the finished emblem with "www.thedotx.com" held for 10s before it loops). The 720 file is the default;
+    the 1080 file is served to very high-density phone screens. The emblem is shown at 360px, so 720 is exactly
+    two video pixels per screen pixel on ordinary displays and one-to-one on retina displays.
   - `hero-nebula.jpg` — hero background. `hero-poster.jpg` — video poster + social share image.
   - `preview-hero.png` — a rendered preview screenshot (not used by the page).
 - **`robots.txt`**, **`sitemap.xml`**, **`llms.txt`** — discoverability (welcomes AI crawlers).
