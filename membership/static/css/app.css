@@ -56,6 +56,8 @@ nav.links .btn,nav.links .btn-gold{padding:9px 18px;font-size:.85rem}
 .hero h1{font-size:clamp(2.2rem,6vw,3.4rem);font-weight:500;margin:.5rem 0}
 .hero p{color:var(--muted);max-width:52ch;margin:1rem auto 0}
 .card{border:1px solid var(--line);border-radius:16px;padding:1.6rem 1.7rem;background:rgba(255,255,255,.02);margin:1.3rem 0}
+.card[id]{scroll-margin-top:96px}   /* jump links land below the sticky banner */
+@media(max-width:1150px){.card[id]{scroll-margin-top:170px}}   /* the banner is taller when its menu wraps */
 .card h2{font-size:1.5rem;font-weight:500;margin-bottom:.5rem}
 .card h3{font-family:var(--font-body);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--denim);font-weight:700;margin-bottom:.5rem}
 .row{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid var(--line)}

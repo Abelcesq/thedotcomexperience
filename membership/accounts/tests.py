@@ -210,6 +210,13 @@ class FooterTests(TestCase):
 
 
 class OwnProfilePageTests(TestCase):
+    def test_profile_header_has_an_account_and_billing_button(self):
+        for who in (make("paid@x.com"), make("new@x.com", status="incomplete")):
+            self.client.force_login(who.user)
+            page = self.client.get(reverse("profile"))
+            self.assertContains(page, '<a class="btn btn-ghost btn-sm" href="#billing">Account &amp; billing</a>')
+            self.assertContains(page, '<div class="card" id="billing">')
+
     def test_profile_page_shows_member_id_and_tier(self):
         amb = make("amb@x.com", R.AMBASSADOR, name="Ana Ambassador")
         me = make("me@x.com", upline=amb, name="Mia Member")

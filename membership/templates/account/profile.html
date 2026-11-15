@@ -17,8 +17,9 @@
         <a class="btn btn-ghost btn-sm" href="{% url 'member_directory' %}">Members</a>
         <a class="btn btn-ghost btn-sm" href="{% url 'connections' %}">Connections{% if pending_requests %}<span class="count">{{ pending_requests }}</span>{% endif %}</a>
         <a class="btn btn-ghost btn-sm" href="{% url 'member_inbox' %}">Messages{% if unread_messages %}<span class="count">{{ unread_messages }}</span>{% endif %}</a>
-        {% if profile.is_charter_holder %}<a class="btn btn-ghost btn-sm" href="{% url 'my_team' %}">My team</a>{% endif %}
       {% endif %}
+      <a class="btn btn-ghost btn-sm" href="#billing">Account &amp; billing</a>
+      {% if profile.can_use_community and profile.is_charter_holder %}<a class="btn btn-ghost btn-sm" href="{% url 'my_team' %}">My team</a>{% endif %}
     </div>
     {% if not profile.can_use_community %}<p class="help">The member directory and messages open once your membership is active.</p>{% endif %}
   </div>
@@ -73,7 +74,7 @@
 </div>
 
 <!-- Membership / Subscription -->
-<div class="card">
+<div class="card" id="billing">
   <h3>Membership</h3>
   <div class="price">{{ MEMBERSHIP_PRICE_LABEL }}</div>
   <div class="row"><span class="k">Status</span><span class="v"><span class="pill {{ profile.membership_status }}">{{ profile.get_membership_status_display }}</span></span></div>
