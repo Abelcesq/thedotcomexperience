@@ -46,6 +46,7 @@ Instagram + X (awareness) â†’ thedotx.com (front door, single call-to-action) â†
 ## Links
 - Front door: https://www.thedotx.com/
 - About (detailed overview): https://www.thedotx.com/about
+- Join our community (all our community and social links): https://www.thedotx.com/community
 - Community (Skool): https://www.skool.com/the-dot-comp-experience-1714/about
 - Instagram: https://www.instagram.com/thedotcomexperience
 - X: https://x.com/THEDOTCOMEXP

@@ -177,6 +177,10 @@ class FooterTests(TestCase):
         self.assertNotContains(page, ">Founder<")
         self.assertNotContains(page, "abelcalderon.com")
 
+    def test_footer_community_link_goes_to_the_community_page(self):
+        page = self.client.get(reverse("account_login"))
+        self.assertContains(page, '<a href="https://www.thedotx.com/community">Community</a>')
+
 
 class OwnProfilePageTests(TestCase):
     def test_profile_page_shows_member_id_and_tier(self):

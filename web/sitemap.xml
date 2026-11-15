@@ -11,6 +11,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.thedotx.com/community</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.thedotx.com/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
