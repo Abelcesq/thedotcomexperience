@@ -59,6 +59,7 @@
   </div>
 </section>
 
+{% if not my_profile.is_active_member %}
 <section class="closing">
   <div class="wrap">
     <h2>Experience the Experience</h2>
@@ -68,6 +69,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 <footer>
   <div class="wrap">

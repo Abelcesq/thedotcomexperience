@@ -189,6 +189,20 @@ class FooterTests(TestCase):
                      "https://x.com/thedotcomexp"):
             self.assertIn(f'href="{link}"', section)
 
+    def test_active_members_do_not_see_the_closing_join_section(self):
+        visitor = self.client.get(reverse("account_login"))
+        self.assertContains(visitor, 'class="closing"')
+        self.assertContains(visitor, "Become a member — $100/month")
+        self.client.force_login(make("paid@x.com").user)                      # active member
+        for url in (reverse("profile"), reverse("profile_edit"), reverse("member_directory"),
+                    reverse("member_inbox"), reverse("dots_finder"), reverse("join")):
+            page = self.client.get(url, follow=True)
+            self.assertNotContains(page, 'class="closing"', msg_prefix=url)
+            self.assertNotContains(page, "Experience the Experience</h2>", msg_prefix=url)
+            self.assertContains(page, "Follow the movement</h2>", msg_prefix=url)   # social links stay
+        self.client.force_login(make("new@x.com", status="incomplete").user)  # signed up, not yet paid
+        self.assertContains(self.client.get(reverse("profile")), "Become a member — $100/month")
+
     def test_footer_community_link_goes_to_the_community_page(self):
         page = self.client.get(reverse("account_login"))
         self.assertContains(page, '<a href="https://www.thedotx.com/community">Community</a>')
