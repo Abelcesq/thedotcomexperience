@@ -250,3 +250,18 @@ class TwoStepTests(Base):
         backup = Authenticator.objects.get(user=self.user, type=Authenticator.Type.RECOVERY_CODES)
         self.client.post(reverse("mfa_authenticate"), {"code": backup.wrap().get_unused_codes()[0]})
         self.assertIn("_auth_user_id", self.client.session)
+
+
+class VisitorAddressTests(TestCase):
+    """Rate limits must be per visitor: the address Heroku saw, not Heroku's own and not a faked one."""
+
+    def test_address_is_the_one_the_router_appended(self):
+        from allauth.core.internal.httpkit import get_client_ip
+        from django.test import RequestFactory
+        rf = RequestFactory()
+        behind_heroku = rf.get("/", HTTP_X_FORWARDED_FOR="10.9.9.9, 203.0.113.7", REMOTE_ADDR="10.1.2.3")
+        self.assertEqual(get_client_ip(behind_heroku), "203.0.113.7")      # not the faked 10.9.9.9
+        other_visitor = rf.get("/", HTTP_X_FORWARDED_FOR="198.51.100.4", REMOTE_ADDR="10.1.2.3")
+        self.assertEqual(get_client_ip(other_visitor), "198.51.100.4")     # not the router's 10.1.2.3
+        local = rf.get("/", REMOTE_ADDR="127.0.0.1")
+        self.assertEqual(get_client_ip(local), "127.0.0.1")

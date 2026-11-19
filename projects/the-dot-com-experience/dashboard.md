@@ -41,6 +41,10 @@ bridge (standard CTA + launch posts), and scope the first local event.
   two-step verification. **Text reminders** for Dots built (Twilio), off until the account
   and carrier registration are done. Config vars pending: see `membership/SECURITY_SETUP.md`
   and `membership/SMS_SETUP.md`.
+- 2026-11-19 — **Security review** (prompted by the NGINX2Root disclosures; nginx is not used
+  here). Fixed: Express dependency advisories on the home site; signup limits could be dodged
+  with a faked address header; member site moved from Django 5.1 (out of support) to 5.2 LTS;
+  sign-in limits were shared by all visitors. `npm audit` and `pip-audit` now report nothing.
 - 2026-11-15 — **Brand line, community page, profile photos.** Banners read "The Dot Com
   Experience • The DotX"; new `/community` page (Skool, Facebook, Instagram, X) that the
   community buttons point to; founder section and links removed from the site; hero video

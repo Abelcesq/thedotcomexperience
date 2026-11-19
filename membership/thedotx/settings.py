@@ -146,6 +146,12 @@ ACCOUNT_ADAPTER = "accounts.adapter.DotxAccountAdapter"
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "website"     # hidden bot trap on the signup form
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "The Dot Com Experience: "
 
+# Sign-in, sign-up and password-reset attempts are limited per visitor address. Heroku's router
+# is the one proxy in front of this app and adds the visitor's real address to the END of
+# X-Forwarded-For, so trust exactly one hop. Without this every visitor appears to come from
+# Heroku's own address, and one person hammering the login page could lock everyone out.
+ALLAUTH_TRUSTED_PROXY_COUNT = int(os.environ.get("TRUSTED_PROXY_COUNT", "1"))
+
 # Two-step verification with an authenticator app (Google Authenticator, Authy, 1Password…).
 MFA_SUPPORTED_TYPES = ["totp", "recovery_codes"]
 MFA_TOTP_ISSUER = "The Dot Com Experience"

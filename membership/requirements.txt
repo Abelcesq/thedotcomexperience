@@ -1,5 +1,5 @@
 # The Dot Com Experience — membership platform (Django)
-Django>=5.1,<5.2
+Django>=5.2.17,<5.3        # 5.2 is the long-term-support line: security fixes until April 2028
 django-allauth[mfa]>=65,<66   # [mfa] adds two-step verification (authenticator apps)
 stripe>=12,<13
 dj-database-url>=2.2
