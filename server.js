@@ -8,7 +8,11 @@ const os = require('os');
 const app = express();
 const ROOT = path.join(__dirname, 'web');
 
-app.enable('trust proxy');
+// Heroku's router is the one proxy in front of this app, and it adds the visitor's real address
+// to the END of X-Forwarded-For. Trusting exactly one hop makes req.ip that real address, rather
+// than whatever a visitor chooses to put in the header themselves (which would let them dodge
+// the per-address signup limits). Set TRUST_PROXY_HOPS=2 if a CDN is ever put in front of Heroku.
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS) || 1);
 app.use(express.json({ limit: '8kb' }));
 
 // CORS for the public subscribe API so our other sites (e.g. abelcalderon.com) can
